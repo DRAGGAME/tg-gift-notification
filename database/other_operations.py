@@ -19,7 +19,7 @@ class OtherOperation(Sqlbase):
 
     async def select_price(self) -> int:
         price = await self.execute_query("""SELECT Purchase_price FROM settings_table""")
-        print(price)
+
         if isinstance(price[0][0], int):
             return price[0][0]
         else:
