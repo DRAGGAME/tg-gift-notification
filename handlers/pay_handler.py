@@ -13,17 +13,23 @@ pay_fabric_kb = FabricInline()
 @pay_router.callback_query(InlineMainMenu.filter(F.action == "pay"))
 async def pay_button_false(callback: CallbackQuery):
     await pay_sqlbase.connect()
+    chat_id = callback.message.chat.id
 
-    kb, price = await pay_fabric_kb.pay_kb(pay_sqlbase)
-    prices = [LabeledPrice(label="XTR", amount=price)]
-    await callback.message.answer_invoice(title='Получать уведомления о подарках',
-                                          description="Оплата счёта",
-                                          prices=prices,
-                                          provider_token='',
-                                          payload="payment_for_the_service",
-                                          currency="XTR",
-                                          reply_markup=kb
-                                          )
+    user_pay = await pay_sqlbase.select_user_for_pay(str(chat_id))
+    if user_pay:
+
+        kb, price = await pay_fabric_kb.pay_kb(pay_sqlbase)
+        prices = [LabeledPrice(label="XTR", amount=price)]
+        await callback.message.answer_invoice(title='Получать уведомления о подарках',
+                                              description="Оплата счёта",
+                                              prices=prices,
+                                              provider_token='',
+                                              payload="payment_for_the_service",
+                                              currency="XTR",
+                                              reply_markup=kb
+                                              )
+    else:
+        await callback.message.edit_text('Вы уже купили товар')
     await callback.answer()
 
 

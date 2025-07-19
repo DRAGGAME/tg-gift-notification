@@ -25,8 +25,13 @@ class OtherOperation(Sqlbase):
         else:
             raise "Ошибка, это не int"
 
-    async def select_user(self, chat_id) -> bool:
+    async def select_user(self, chat_id: str) -> bool:
         result = await self.execute_query("""SELECT chat_id FROM accepted_users WHERE chat_id=$1""", (chat_id,))
+
+        return not bool(result)
+
+    async def select_user_for_pay(self, chat_id: str) -> bool:
+        result = await self.execute_query("""SELECT chat_id FROM user_data WHERE chat_id=$1""", (chat_id,))
 
         return not bool(result)
 
