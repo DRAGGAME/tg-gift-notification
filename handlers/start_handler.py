@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, Gifts
 
 from config import bot
 from database.other_operations import OtherOperation
@@ -16,6 +16,7 @@ start_sqlbase = OtherOperation()
 @start_router.message(CommandStart())
 async def start_message(message: Message):
     await start_sqlbase.connect()
+    result: Gifts = await bot.get_available_gifts()
     chat_id = message.chat.id
     check = await start_sqlbase.select_user(str(chat_id))
     if check:
