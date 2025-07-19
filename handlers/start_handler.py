@@ -4,6 +4,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
 
+from config import bot
 from database.other_operations import OtherOperation
 from keyboards.menu_fabric import FabricInline, InlineMainMenu
 
@@ -27,8 +28,9 @@ async def start_message(message: Message):
             f'<a href="{url_politics_kond}">Политика конфиденциальности</a>', parse_mode=ParseMode.HTML, reply_markup=kb)
     else:
         kb = await keyboard_fabric.create_inline_main()
-
-        await message.answer("Выберите опцию: ", reply_markup=kb)
+        await bot.unpin_all_chat_messages(chat_id=message.chat.id)
+        msg = await message.answer("Выберите опцию: ", reply_markup=kb)
+        await bot.pin_chat_message(chat_id=message.chat.id, message_id=msg.message_id)
 
 
 @start_router.message(F.text.lower().startswith('да'))
@@ -46,7 +48,9 @@ async def choice(message: Message):
 
         await start_sqlbase.accept_politics(str(chat_id))
     await start_sqlbase.close()
-    await message.answer("Теперь, выберите опцию: ", reply_markup=kb)
+    await bot.unpin_all_chat_messages(chat_id=message.chat.id)
+    msg = await message.answer("Выберите опцию: ", reply_markup=kb)
+    await bot.pin_chat_message(chat_id=message.chat.id, message_id=msg.message_id)
 
 
 @start_router.callback_query(InlineMainMenu.filter(F.action == 'back'))

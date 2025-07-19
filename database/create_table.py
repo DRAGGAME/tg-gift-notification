@@ -9,7 +9,8 @@ class CreateTable(Sqlbase):
         chat_id TEXT UNIQUE NOT NULL,
         purchased BOOLEAN DEFAULT TRUE,
         date_pay TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Moscow'),
-
+        transaction_id TEXT UNIQUE NOT NULL,
+        amount INTEGER NOT NULL,
         FOREIGN KEY (chat_id) REFERENCES accepted_users (chat_id) ON DELETE RESTRICT
         );""")
 
@@ -29,6 +30,8 @@ class CreateTable(Sqlbase):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS settings_table (
         id SERIAL PRIMARY KEY,
         Purchase_price BIGINT DEFAULT 150,
+        admin_id TEXT,
+        password_admin TEXT DEFAULT vFDJSldsfCEldsSA123_#i, 
         user_politics TEXT,
         kond_politics TEXT);""")
 

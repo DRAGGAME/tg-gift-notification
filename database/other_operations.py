@@ -36,13 +36,15 @@ class OtherOperation(Sqlbase):
         return not bool(result)
 
     async def accept_politics(self, chat_id: str):
-        await self.execute_query("""INSERT INTO accepted_users (chat_id, date_accept_politics) VALUES ($1, DEFAULT)""",
-                                 (chat_id,))
-
-    async def insert_new_user(self, chat_id: str):
         await self.execute_query(
-            """INSERT INTO accepted_users (chat_id, date_pay, purchased) VALUES ($1, DEFAULT, DEFAULT)""",
+            """INSERT INTO accepted_users (chat_id, date_accept_politics) VALUES ($1, DEFAULT)""",
             (chat_id,))
+
+    async def insert_new_user(self, chat_id: str, transaction_id: str, amount: int):
+        await self.execute_query(
+            """INSERT INTO user_data (chat_id, transaction_id, amount, date_pay, purchased) 
+            VALUES ($1, $2, $3, DEFAULT, DEFAULT)""",
+            (chat_id, transaction_id, amount))
 
     async def select_url(self):
         url = await self.execute_query("""SELECT user_politics, kond_politics FROM settings_table""")
