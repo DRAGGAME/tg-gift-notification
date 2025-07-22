@@ -16,9 +16,7 @@ start_sqlbase = OtherOperation()
 @start_router.message(CommandStart())
 async def start_message(message: Message):
     await start_sqlbase.connect()
-    result: Gifts = await bot.get_available_gifts()
-    gift_emojis = [gift for gift in result]
-    print(type(gift_emojis[0][1][0]))
+
     chat_id = message.chat.id
     check = await start_sqlbase.select_user(str(chat_id))
     if check:
@@ -63,5 +61,7 @@ async def back_inline(callback: CallbackQuery):
         await callback.message.edit_text("Выберите опцию", reply_markup=kb)
     except TelegramBadRequest:
         await callback.message.delete()
+        await callback.message.answer("Выберите опцию", reply_markup=kb)
+
 
     await callback.answer()

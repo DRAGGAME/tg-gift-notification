@@ -14,6 +14,16 @@ class CreateTable(Sqlbase):
         FOREIGN KEY (chat_id) REFERENCES accepted_users (chat_id) ON DELETE RESTRICT
         );""")
 
+    async def create_transaction_donat(self):
+        await self.execute_query("""CREATE TABLE IF NOT EXISTS all_transaction (
+        id SERIAL PRIMARY KEY,
+        chat_id TEXT NOT NULL,
+        date_pay TIMESTAMP WITH TIME ZONE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Moscow'),
+        transaction_id TEXT UNIQUE NOT NULL,
+        amount INTEGER NOT NULL,
+        FOREIGN KEY (chat_id) REFERENCES accepted_users (chat_id) ON DELETE RESTRICT
+        );""")
+
     async def create_accepted_users_table(self):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS accepted_users (
         id SERIAL PRIMARY KEY,
@@ -30,10 +40,12 @@ class CreateTable(Sqlbase):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS settings_table (
         id SERIAL PRIMARY KEY,
         Purchase_price BIGINT DEFAULT 150,
-        admin_id TEXT,
-        password_admin TEXT DEFAULT vFDJSldsfCEldsSA123_#i, 
+        admin_id TEXT,            
+        password_admin TEXT DEFAULT 'vFDJSldsfCEldsSA123_#i', 
+        active_admin BOOLEAN DEFAULT FALSE,
         user_politics TEXT,
-        kond_politics TEXT);""")
+        kond_politics TEXT,
+        count_gifts INTEGER);""")
 
         if await self.execute_query("""SELECT Purchase_price FROM settings_table LIMIT 1"""):
             pass

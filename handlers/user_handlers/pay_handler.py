@@ -29,26 +29,32 @@ async def pay_button_false(callback: CallbackQuery):
                                               reply_markup=kb
                                               )
     else:
+        kb = await pay_fabric_kb.donate_kb()
         await callback.message.edit_text(
             'Вы уже купили услугу, но вы можете пожертвовать звёзды за работу бота,'
-            ' если вы хотите их пожертвовать, то нажмите кнопку "Пожертвовать"')
+            ' если вы хотите их пожертвовать, то нажмите кнопку "Пожертвовать"', reply_markup=kb)
+
     await callback.answer()
-
-
-@pay_router.pre_checkout_query()
-async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery):
-    await pre_checkout_query.answer(ok=True)
 
 
 @pay_router.message(F.successful_payment)
 async def successful(message: Message):
     transaction_id = message.successful_payment.telegram_payment_charge_id
     amount = message.successful_payment.total_amount
-    await pay_sqlbase.insert_new_user(str(message.chat.id), transaction_id, amount)
+    info = message.successful_payment.invoice_payload
     kb = await pay_fabric_kb.builder_answer_notifications()
 
-    await message.answer(f"Спасибо, что приобрели нашу услугу\n\n"
-                         f"Ваш id транзакции сохраните его, если захотите вернуть звёзды за покупку: "
-                         f"<code>{transaction_id}</code>\n"
-                         f"Цена: {amount}",
-                         reply_markup=kb)
+    if info == "payment_for_the_service":
+        await pay_sqlbase.insert_new_user(str(message.chat.id), transaction_id, amount)
+
+        await message.answer(f"Спасибо, что приобрели нашу услугу\n\n"
+                             f"Ваш id транзакции сохраните его, если захотите вернуть звёзды за покупку: "
+                             f"<code>{transaction_id}</code>\n"
+                             f"Цена: {amount}",
+                             reply_markup=kb)
+    else:
+        await pay_sqlbase.insert_transaction_donat(str(message.chat.id), transaction_id, amount)
+        await message.answer(f"Спасибо за поддержку! Пожертвование является добровольным. \n"
+                             f"При необходимости вы можете запросить возврат — мы рассмотрим обращение индивидуально.\n\n"
+                             f"<code>{transaction_id}</code>",
+                             reply_markup=kb)

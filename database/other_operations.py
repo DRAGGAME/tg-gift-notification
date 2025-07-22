@@ -9,8 +9,8 @@ class OtherOperation(Sqlbase):
         text = 'FAQ'
         all_faq = await self.execute_query("""SELECT * FROM faq_table ORDER BY id ASC;""")
         if all_faq:
-            for faq in all_faq:
-                text += f"\n\n{faq[0]}) Вопрос: {faq[1]}\n{' ' * 4}Ответ: {faq[2]}"
+            for count, faq in enumerate(all_faq):
+                text += f"\n\n{count+1}) Вопрос: {faq[1]}\n{' ' * 4}Ответ: {faq[2]}"
 
             return text
 
@@ -46,6 +46,13 @@ class OtherOperation(Sqlbase):
             VALUES ($1, $2, $3, DEFAULT, DEFAULT)""",
             (chat_id, transaction_id, amount))
 
+    async def insert_transaction_donat(self, chat_id: str, transaction_id: str, amount: int):
+        await self.execute_query(
+            """INSERT INTO all_transaction (chat_id, transaction_id, amount, date_pay) 
+            VALUES ($1, $2, $3, DEFAULT)""",
+            (chat_id, transaction_id, amount))
+
     async def select_url(self):
         url = await self.execute_query("""SELECT user_politics, kond_politics FROM settings_table""")
         return url[0][0], url[0][1]
+
