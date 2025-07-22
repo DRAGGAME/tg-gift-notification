@@ -86,7 +86,13 @@ async def url_user(callback: CallbackQuery, state: FSMContext):
 async def url_edit_user(message: Message, state: FSMContext):
     if message.text:
         await sqlbase_upgrade.connect()
-        await sqlbase_upgrade.update_url_user(message.text)
+        try:
+            price = int(message.text)
+        except ValueError:
+            await message.answer("Введите корректный id")
+            return
+
+        await sqlbase_upgrade.update_price(price)
         await sqlbase_upgrade.close()
         kb = await keyboard_fabric_update.inline_admin_main_menu()
 

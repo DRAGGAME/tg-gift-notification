@@ -19,14 +19,17 @@ async def start_cmd(pool_sqlbase: Sqlbase):
 
     users = await pool_sqlbase.execute_query("""SELECT chat_id FROM user_data WHERE purchased = True""")
     if last_count:
-        if count > last_count[0][0]:
-            for user in users:
-                message = f"Вышло новых подарков: {count-last_count[0][0]}"
-                await bot.send_message(chat_id=user[0], text=message)
-                await asyncio.sleep(5)
-        elif count < last_count[0][0]:
-            await bot.send_message(f"Лимитированный подарки закончились: {last_count[0][0]-count}")
-        else:
+        try:
+            if count > last_count[0][0]:
+                for user in users:
+                    message = f"Вышло новых подарков: {count-last_count[0][0]}"
+                    await bot.send_message(chat_id=user[0], text=message)
+                    await asyncio.sleep(5)
+            elif count < last_count[0][0]:
+                await bot.send_message(f"Лимитированный подарки закончились: {last_count[0][0]-count}")
+            else:
+                pass
+        except TypeError:
             pass
 
 
