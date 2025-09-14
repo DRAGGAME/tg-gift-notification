@@ -8,7 +8,7 @@ dependencies:
   - python>=3.10.0
   - asyncpg
   - apscheduler
-  -
+  - g4f[all]
   - pip:
     - aiogram>=3.5.0
     - python-dotenv

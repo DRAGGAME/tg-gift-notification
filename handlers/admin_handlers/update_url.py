@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
 from pydantic import AnyWebsocketUrl
-
+import g4f[all]
 from database.admin_operations import AdminOperations
 from handlers.admin_handlers.all_a_admin_function import router_for_admin
 from keyboards.menu_fabric import InlineMainMenu, InlineAdminMenu, FabricInline
