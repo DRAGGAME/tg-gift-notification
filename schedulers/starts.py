@@ -8,7 +8,7 @@ from database.db import Sqlbase
 from database.other_operations import OtherOperation
 from logger import logger
 
-async def start_cmd(pool_sqlbase: Sqlbase):
+async def start_cmd(pool_sqlbase: Sqlbase, all_tmp_message: list=[]):
     await pool_sqlbase.connect()
 
     result: Gifts = await bot.get_available_gifts()
@@ -68,21 +68,23 @@ async def start_cmd(pool_sqlbase: Sqlbase):
             for gift in sorted_gifts:
                 gift_id = gift[0]
                 gift_price = gift[1][0]
+
                 for _ in range(count_one_gift):
                     if bot_balance - gift_price >= 0:
 
                         bot_balance -= gift_price
-                        await bot.send_gift(gift_id=gift_id, chat_id=default_channel)
+                        id_message = await bot.send_gift(gift_id=gift_id, chat_id=default_channel)
+                        all_tmp_message.append(id_message)
                         await asyncio.sleep(10)
+
                     else:
                         logger.info(f"Бот не может купить подарок. \nХватает ли баланса: {bool(bot_balance-gift_price)}")
                         await bot.send_message(chat_id=admin_chat_id, text="У бота кончились звёзды")
-            last_gift = sorted_gifts[0]
+            for tmp_message in all_tmp_message:
+                await bot.delete_message(chat_id=tmp_message.chat.id, message_id=tmp_message.message_id)
+                await asyncio.sleep(10)
 
-            print("Выбранный подарок для отправки:", last_gift)
 
-
-
-sqlbase = OtherOperation()
-asyncio.run(start_cmd(pool_sqlbase=sqlbase))
+# sqlbase = OtherOperation()
+# asyncio.run(start_cmd(pool_sqlbase=sqlbase))
 

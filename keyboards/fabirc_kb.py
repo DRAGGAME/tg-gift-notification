@@ -25,14 +25,3 @@ class KeyboardFactory:
             input_field_placeholder=text_input, one_time_keyboard=True)
         return keyboard
 
-    async def builder_answer_notifications(self):
-        await self.create_builder_reply()
-        self.builder_reply.add(KeyboardButton(text="Отправлять уведомления"))
-        self.builder_reply.add(KeyboardButton(text="Не отправлять уведомления"))
-        keyboard = self.builder_reply.as_markup(
-            resize_keyboard=True,
-            input_field_placeholder="Отправлять ли уведомления: ",
-            one_time_keyboard=False,
-            is_persistent=True)
-
-        return keyboard

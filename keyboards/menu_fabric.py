@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, Tuple
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, KeyboardButton
@@ -32,129 +32,86 @@ class FabricInline(KeyboardFactory):
             ).pack()
         )
 
-    async def create_inline_main(self):
-        await self.create_builder_inline()
-        faq_button = InlineKeyboardButton(
-            text="Тех.поддержка",
-            callback_data=InlineMainMenu(
-                action="faq",
-            ).pack()
-        )
+    async def create_replenishment_keyboard(self):
 
         pay_notifications = InlineKeyboardButton(
-            text="Купить доступ",
+            text="Пополнить",
             callback_data=InlineMainMenu(
-                action="pay",
+                action="replenishment",
             ).pack()
         )
 
-        self.builder_inline.add(faq_button)
         self.builder_inline.add(pay_notifications)
 
         return self.builder_inline.as_markup()
 
-    async def inline_admin_main_menu(self):
+    async def inline_main_menu(self, price: tuple, gift: tuple):
 
         await self.create_builder_inline()
 
-        button_upd_login = InlineKeyboardButton(
-            text="Обновить пароль",
+        button_profiles = InlineKeyboardButton(
+            text="Переключить профиль",
             callback_data=InlineAdminMenu(
-                action="UpdPassword"
+                action="switch_profile",
             ).pack()
         )
 
-        button_edit_politics_url = InlineKeyboardButton(
-            text="Ссылка на политику конфиденциальности",
+        button_clear_settings = InlineKeyboardButton(
+            text="Заводские настройки",
             callback_data=InlineAdminMenu(
-                action="UrlPolitics"
+                action="clear_settings",
             ).pack()
         )
 
-        button_edit_user_url = InlineKeyboardButton(
-            text="Ссылка на пользовательское соглашение",
-            callback_data=InlineAdminMenu(
-                action="UrlUser"
-            ).pack()
-        )
-
-        button_edit_price = InlineKeyboardButton(
-            text="Изменить цену услуги",
-            callback_data=InlineAdminMenu(
-                action="EditPrice",
-            ).pack()
-        )
-
-        button_add_faq = InlineKeyboardButton(
-            text="Добавить вопрос-ответ",
-            callback_data=InlineAdminMenu(
-                action="add_faq"
-            ).pack()
-        )
-
-        button_delete_faq = InlineKeyboardButton(
-            text="Удалить вопрос-ответ",
-            callback_data=InlineAdminMenu(
-                action="delete_faq"
-            ).pack()
-        )
-
-        button_truncate_faq = InlineKeyboardButton(
-            text="Удалить весь FAQ",
-            callback_data=InlineAdminMenu(
-                action="truncate_faq"
-            ).pack()
-        )
-
-        button_exit = InlineKeyboardButton(
-            text="Выйти из супер-администратора",
-            callback_data=InlineAdminMenu(
-                action="exit",
-            ).pack()
-        )
-
-        self.builder_inline.row(button_upd_login)
-        self.builder_inline.row(button_edit_politics_url)
-        self.builder_inline.row(button_edit_user_url)
-        self.builder_inline.row(button_edit_price)
-        self.builder_inline.row(button_add_faq)
-        self.builder_inline.row(button_delete_faq)
-        self.builder_inline.row(button_truncate_faq)
-        self.builder_inline.row(button_exit)
+        self.builder_inline.row(button_profiles)
+        self.builder_inline.row(button_clear_settings)
         return self.builder_inline.as_markup()
 
-    async def pay_kb(self, sqlbase: Optional[Union[OtherOperation, Sqlbase]], price=-1):
+    async def inline_profile_menu(self, price: tuple, gift: tuple):
         await self.create_builder_inline()
-        if price == -1:
-            price = await sqlbase.select_price()
-
-            pay = InlineKeyboardButton(
-                text=f"Оплатить {price} XTR",
-                pay=True,
-            )
-        else:
-            pay = InlineKeyboardButton(
-                text=f"Оплатить {price} XTR",
-                pay=True,
-            )
-        self.builder_inline.add(pay)
-        self.builder_inline.row(self.back_button)
-
-        return self.builder_inline.as_markup(), price
-
-    async def donate_kb(self):
-        await self.create_builder_inline()
-
-        pay_button = InlineKeyboardButton(
-            text="Пожертвование",
-            callback_data=InlineMainMenu(
-                action="donate"
+        button_begin_price = InlineKeyboardButton(
+            text=f"От {price[0]}",
+            callback_data=InlineAdminMenu(
+                action="begin_price",
             ).pack()
         )
 
-        self.builder_inline.add(pay_button, self.back_button)
+        button_end_price = InlineKeyboardButton(
+            text=f"От {price[1]}",
+            callback_data=InlineAdminMenu(
+                action="begin_price",
+            ).pack()
+        )
 
-        return self.builder_inline.as_markup()
+        button_begin_gift = InlineKeyboardButton(
+            text=f"От {gift[0]}",
+            callback_data=InlineAdminMenu(
+                action="begin_price",
+            ).pack()
+        )
+
+        button_end_gift = InlineKeyboardButton(
+            text=f"От {gift[1]}",
+            callback_data=InlineAdminMenu(
+                action="begin_price",
+            ).pack()
+        )
+
+        button_replenishment = InlineKeyboardButton(
+            text="Пополнение звёзд",
+            callback_data=InlineAdminMenu(
+                action="replenishment",
+            ).pack()
+        )
+
+        return
+
+    async def inline_switch_profiles_menu(self, profiles: tuple):
+        if profiles:
+            for profile in profiles:
+                pass # Изменить
+
+
 
     async def back_kb(self):
         await self.create_builder_inline()

@@ -4,18 +4,20 @@ from database.db import Sqlbase
 
 
 class AdminOperations(Sqlbase):
-    async def check_login(self) -> bool:
-        check_active = await self.execute_query("""SELECT active_admin FROM settings_table""")
-        return check_active[0][0]
+    async def setup_query(self, admin_chat_id: str) -> None:
+        await self.execute_query("""UPDATE settings_table SET admin_chat_id = $1""", (admin_chat_id, ))
+
+    async def select_password_and_user(self) -> tuple:
+        password_admin = await self.execute_query("""SELECT password_admin, admin_chat_id FROM settings_table""")
+        return password_admin[0]
+
+    async def update_admin_password(self, admin_chat_id: str) -> None:
+        await self.execute_query("""UPDATE settings_table SET password_admin=$1, admin_chat_id=$2""",
+                                 (None, admin_chat_id))
 
     async def update_state_admin(self, user_active: bool):
-        await self.execute_query("""UPDATE settings_table SET active_admin = $1;""", (user_active,))
-
-    async def update_url_user(self, url: str):
-        await self.execute_query("""UPDATE settings_table SET user_politics=$1""", (url,))
-
-    async def update_url_politics(self, url: str):
-        await self.execute_query("""UPDATE settings_table SET kond_politics=$1""", (url,))
+            await self.execute_query("""UPDATE settings_table
+                                    SET active_admin = $1;""", (user_active,))
 
     async def update_price(self, price: int):
         await self.execute_query("""UPDATE settings_table SET Purchase_price=$1""", (price,))

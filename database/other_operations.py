@@ -5,26 +5,6 @@ from database.db import Sqlbase
 
 class OtherOperation(Sqlbase):
 
-    async def select_faq(self) -> Optional[str]:
-        text = 'FAQ'
-        all_faq = await self.execute_query("""SELECT * FROM faq_table ORDER BY id ASC;""")
-        if all_faq:
-            for count, faq in enumerate(all_faq):
-                text += f"\n\n{count+1}) Вопрос: {faq[1]}\n{' ' * 4}Ответ: {faq[2]}"
-
-            return text
-
-        else:
-            return None
-
-    async def select_price(self) -> int:
-        price = await self.execute_query("""SELECT Purchase_price FROM settings_table""")
-
-        if isinstance(price[0][0], int):
-            return price[0][0]
-        else:
-            raise "Ошибка, это не int"
-
     async def select_user(self, chat_id: str) -> bool:
         result = await self.execute_query("""SELECT chat_id FROM accepted_users WHERE chat_id=$1""", (chat_id,))
 
