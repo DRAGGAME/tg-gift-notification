@@ -6,7 +6,8 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from database.admin_operations import AdminOperations
-from filters.check_admin import CheckAdmin
+from filters.check_admin_for_setup import CheckAdminSetup
+
 
 from keyboards.menu_fabric import FabricInline
 router_for_admin = Router()
@@ -18,7 +19,7 @@ class SetupFSM(StatesGroup):
     setup_password = State()
 
 
-@router_for_admin.message(Command(commands=["setup", "Setup"]), CheckAdmin(sqlbase_for_admin_function))
+@router_for_admin.message(Command(commands=["setup", "Setup"]), CheckAdminSetup(sqlbase_for_admin_function))
 async def setup_handler(message: Message, state: FSMContext):
     await sqlbase_for_admin_function.connect()
     password = await sqlbase_for_admin_function.select_password_and_user()
@@ -46,6 +47,8 @@ async def setup_from_password_handler(message: Message, state: FSMContext):
         await state.clear()
         await message.answer("Это сообщение не текст\nВведите команду и пароль заново")
     await sqlbase_for_admin_function.close()
+
+
 
 
 

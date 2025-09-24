@@ -7,7 +7,8 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from config import bot
 from database.create_table import CreateTable
-from handlers.admin_handlers.all_a_admin_function import router_for_admin
+from handlers.admin_handlers.main_handlers import router_for_main
+from handlers.user_handlers import router_for_admin
 from handlers.stop_handler import router_for_stop
 
 from schedulers.scheduler_object import scheduler
@@ -20,7 +21,7 @@ logging.basicConfig(
 )
 
 dp = Dispatcher()
-dp.include_routers(router_for_admin, router_for_stop)
+dp.include_routers(router_for_admin, router_for_stop, router_for_main)
 
 @dp.pre_checkout_query()
 async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery):
