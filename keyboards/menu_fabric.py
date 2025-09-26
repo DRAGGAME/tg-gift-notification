@@ -16,7 +16,7 @@ class InlineAdminMenu(CallbackData, prefix="main_menu"):
 
 class InlineSwitchProfile(CallbackData, prefix="switch_profile"):
     profile_action: str
-    profile_data: Optional[tuple]
+    profile_data: Optional[str]
 
 
 class Payment(CallbackData, prefix="payment"):
@@ -111,20 +111,21 @@ class FabricInline(KeyboardFactory):
             ).pack()
         )
 
-        await self.builder_inline.add(button_create_profile)
+        self.builder_inline.add(button_create_profile)
 
         if profiles:
             for profile in profiles:
+                print(type(tuple(profile)))
                 button_tmp_profile = InlineKeyboardButton(
-                    text=f"{profile[-1]} {profile[-2]} {profile[-3]}",
+                    text=f"{profile[4]} {profile[1]}",
                     callback_data=InlineSwitchProfile(
                         profile_action="switch_profile",
-                        profile_data=profile,
+                        profile_data=f"{profile[-1]}",
                     ).pack()
                 )
-                await self.builder_inline.row(button_tmp_profile)
+                self.builder_inline.row(button_tmp_profile)
 
-        await self.builder_inline.row(self.back_button)
+        self.builder_inline.row(self.back_button)
         return self.builder_inline.as_markup()
 
     async def back_kb(self):

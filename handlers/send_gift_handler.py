@@ -6,6 +6,6 @@ router_gift = Router(name="gift_router")
 
 @router_gift.message(Command("replenishment"))
 async def replenishment_handler(message: Message, state: FSMContext):
-    awa
+    pass
 
 

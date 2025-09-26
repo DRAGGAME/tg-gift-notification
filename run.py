@@ -6,6 +6,7 @@ from aiogram.types import PreCheckoutQuery
 from apscheduler.triggers.interval import IntervalTrigger
 
 from config import bot
+from database.admin_operations import AdminOperations
 from database.create_table import CreateTable
 from handlers.admin_handlers.main_handlers import router_for_main
 from handlers.user_handlers import router_for_admin
@@ -32,10 +33,11 @@ async def main():
     sqlbase_create_table = CreateTable()
     await sqlbase_create_table.connect()
     # await sqlbase_create_table.delete_all()
+    await sqlbase_create_table.create_profiles_table()
     await sqlbase_create_table.create_settings_table()
     await sqlbase_create_table.create_transaction_donat()
-
-    scheduler.add_job(start_cmd, IntervalTrigger(minutes=1), args=[sqlbase_create_table])
+    sqlbase_admin = AdminOperations()
+    scheduler.add_job(start_cmd, IntervalTrigger(minutes=1), args=[sqlbase_admin])
     scheduler.start()
     await dp.start_polling(bot)  # Запускаем бота
 

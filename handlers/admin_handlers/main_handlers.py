@@ -1,12 +1,12 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import CommandStart
 
 from config import bot
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from database.admin_operations import AdminOperations
 from filters.check_admin import CheckAdminDefault
 from filters.check_admin_for_setup import CheckAdminSetup
-from keyboards.menu_fabric import FabricInline
+from keyboards.menu_fabric import FabricInline, InlineAdminMenu
 
 router_for_main = Router()
 sqlbase_admin = AdminOperations()
@@ -20,6 +20,7 @@ async def start_for_main(message: Message):
 
     keyboard_start = await keyboard_factory.inline_main_menu()
     bot_balance_stars = await bot.get_my_star_balance(request_timeout=30)
+
     if hasattr(bot_balance_stars, "amount"):
         bot_balance_stars = getattr(bot_balance_stars, "amount")
 
@@ -27,4 +28,13 @@ async def start_for_main(message: Message):
                          "Что вы хотите сделать?\n\n"
                          "<pre>"
                          f"Баланс звёзд в боте(ваши): {bot_balance_stars}"
-                         f"</pre>", reply_markup=keyboard_start, protect_content=True)
+                         f"</pre>", reply_markup=keyboard_start)
+
+@router_for_main.callback_query(InlineAdminMenu.filter(F.action=="switch_profile"))
+async def switch_profile_callback(callback: CallbackQuery):
+    await sqlbase_admin.connect()
+    all_profiles = await sqlbase_admin.select_all_profiles()
+    kb = await keyboard_factory.inline_switch_profiles_menu(all_profiles)
+    await sqlbase_admin.close()
+    await callback.message.edit_text("Выберите профиль", reply_markup=kb)
+    await callback.answer("Выберите профиль")

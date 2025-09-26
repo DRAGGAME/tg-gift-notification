@@ -4,11 +4,12 @@ import numpy as np
 from aiogram.types import Gifts, Gift, Sticker, PhotoSize
 
 from config import bot
+from database.admin_operations import AdminOperations
 from database.db import Sqlbase
 from database.other_operations import OtherOperation
 from logger import logger
 
-async def start_cmd(pool_sqlbase: Sqlbase, all_tmp_message: list=[]):
+async def start_cmd(pool_sqlbase: AdminOperations, all_tmp_message: list=[]):
     await pool_sqlbase.connect()
 
     result: Gifts = await bot.get_available_gifts()
@@ -27,9 +28,7 @@ async def start_cmd(pool_sqlbase: Sqlbase, all_tmp_message: list=[]):
                 logger.info("Существует подарок премиум-подарок")
                 all_premium_gift[gift_id] = (price_gift, total_count, end_count, )
 
-    all_settings = await pool_sqlbase.execute_query("""SELECT type_regime, count_gifts, count_one_gift, price_min, 
-                                                              price_max, bot_balance, default_channel, admin_chat_id 
-                                                       FROM settings_table WHERE admin_chat_id <> 'default'""")
+    all_settings = await pool_sqlbase.select_all_profiles()
     if not all_settings:
         logger.warning("Нет записи, что существует администратор. ")
         return
@@ -37,14 +36,15 @@ async def start_cmd(pool_sqlbase: Sqlbase, all_tmp_message: list=[]):
     logger.info("Существует запись в БД. Работа продолжена")
 
     type_regime = all_settings[0][0]
-    count_gifts = all_settings[0][1]
-    count_one_gift = all_settings[0][2]
-    price_min = all_settings[0][3]
-    price_max = all_settings[0][4]
-    bot_balance = all_settings[0][5]
-    default_channel = all_settings[0][6]
-    admin_chat_id = all_settings[0][7]
-
+    count_one_gift = all_settings[0][1]
+    price_min = all_settings[0][2]
+    price_max = all_settings[0][3]
+    bot_balance = all_settings[0][4]
+    default_channel = all_settings[0][5]
+    admin_chat_id = all_settings[0][6]
+    if admin_chat_id == "0":
+        logger.warning("Нет админа")
+        return
     if type_regime == "down":
         logger.info("Активирован режим покупки с высшего до нисшего...")
         all_gifts = [(gift_id, values) for gift_id, values in all_premium_gift.items()
@@ -79,7 +79,9 @@ async def start_cmd(pool_sqlbase: Sqlbase, all_tmp_message: list=[]):
 
                     else:
                         logger.info(f"Бот не может купить подарок. \nХватает ли баланса: {bool(bot_balance-gift_price)}")
-                        await bot.send_message(chat_id=admin_chat_id, text="У бота кончились звёзды")
+                        msg = await bot.send_message(chat_id=admin_chat_id, text="У бота кончились звёзды")
+                        await bot.delete_message(message_id=msg.message_id, chat_id=admin_chat_id)
+                        break
             for tmp_message in all_tmp_message:
                 await bot.delete_message(chat_id=tmp_message.chat.id, message_id=tmp_message.message_id)
                 await asyncio.sleep(10)
