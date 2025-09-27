@@ -10,7 +10,7 @@ from filters.check_admin_for_setup import CheckAdminSetup
 
 
 from keyboards.menu_fabric import FabricInline
-router_for_admin = Router()
+router_for_user = Router()
 sqlbase_for_admin_function = AdminOperations()
 keyboard = FabricInline()
 
@@ -19,7 +19,7 @@ class SetupFSM(StatesGroup):
     setup_password = State()
 
 
-@router_for_admin.message(Command(commands=["setup", "Setup"]), CheckAdminSetup(sqlbase_for_admin_function))
+@router_for_user.message(Command(commands=["setup", "Setup"]), CheckAdminSetup(sqlbase_for_admin_function))
 async def setup_handler(message: Message, state: FSMContext):
     await sqlbase_for_admin_function.connect()
     password = await sqlbase_for_admin_function.select_password_and_user()
@@ -32,7 +32,7 @@ async def setup_handler(message: Message, state: FSMContext):
         await state.clear()
         await message.answer("Пароля - не существует, видимо, администратор уже существует\nВведите команду и пароль заново")
 
-@router_for_admin.message(SetupFSM.setup_password)
+@router_for_user.message(SetupFSM.setup_password)
 async def setup_from_password_handler(message: Message, state: FSMContext):
     if message.text:
         password = await state.get_value("password")

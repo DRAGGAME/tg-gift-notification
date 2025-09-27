@@ -19,7 +19,7 @@ class CreateTable(AdminOperations):
         if await self.execute_query("""SELECT * FROM profiles"""):
             pass
         else:
-            await self.insert_profile(number_profile=1)
+            await self.insert_profile()
 
     async def create_transaction_donat(self):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS all_transaction (

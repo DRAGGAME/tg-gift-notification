@@ -9,8 +9,10 @@ from config import bot
 from database.admin_operations import AdminOperations
 from database.create_table import CreateTable
 from handlers.admin_handlers.main_handlers import router_for_main
-from handlers.user_handlers import router_for_admin
-from handlers.stop_handler import router_for_stop
+from handlers.admin_handlers.switch_profile_handlers import router_for_switch
+from handlers.admin_handlers.upd_gift_and_star import router_upd
+from handlers.user_handlers import router_for_user
+from handlers.back_main_handler import router_for_back
 
 from schedulers.scheduler_object import scheduler
 from schedulers.starts import start_cmd
@@ -22,7 +24,7 @@ logging.basicConfig(
 )
 
 dp = Dispatcher()
-dp.include_routers(router_for_admin, router_for_stop, router_for_main)
+dp.include_routers(router_for_user, router_for_back, router_for_main, router_for_switch, router_upd)
 
 @dp.pre_checkout_query()
 async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery):

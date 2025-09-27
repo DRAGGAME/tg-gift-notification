@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from database.admin_operations import AdminOperations
 from filters.check_admin import CheckAdminDefault
 from filters.check_admin_for_setup import CheckAdminSetup
-from keyboards.menu_fabric import FabricInline, InlineAdminMenu
+from keyboards.menu_fabric import FabricInline, InlineAdminMenu, InlineSwitchProfile
 
 router_for_main = Router()
 sqlbase_admin = AdminOperations()
@@ -24,6 +24,7 @@ async def start_for_main(message: Message):
     if hasattr(bot_balance_stars, "amount"):
         bot_balance_stars = getattr(bot_balance_stars, "amount")
 
+    await message.delete()
     await message.answer("Вы открыли панель действий\n"
                          "Что вы хотите сделать?\n\n"
                          "<pre>"
@@ -33,8 +34,12 @@ async def start_for_main(message: Message):
 @router_for_main.callback_query(InlineAdminMenu.filter(F.action=="switch_profile"))
 async def switch_profile_callback(callback: CallbackQuery):
     await sqlbase_admin.connect()
-    all_profiles = await sqlbase_admin.select_all_profiles()
+    all_profiles = await sqlbase_admin.select_profiles()
     kb = await keyboard_factory.inline_switch_profiles_menu(all_profiles)
     await sqlbase_admin.close()
     await callback.message.edit_text("Выберите профиль", reply_markup=kb)
     await callback.answer("Выберите профиль")
+
+@router_for_main.callback_query(InlineSwitchProfile.filter(F.action=="create_profile"))
+async def create_profile_callback(callback: CallbackQuery):
+    pass

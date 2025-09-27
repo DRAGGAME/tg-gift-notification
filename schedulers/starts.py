@@ -28,7 +28,7 @@ async def start_cmd(pool_sqlbase: AdminOperations, all_tmp_message: list=[]):
                 logger.info("Существует подарок премиум-подарок")
                 all_premium_gift[gift_id] = (price_gift, total_count, end_count, )
 
-    all_settings = await pool_sqlbase.select_all_profiles()
+    all_settings = await pool_sqlbase.select_profile_last()
     if not all_settings:
         logger.warning("Нет записи, что существует администратор. ")
         return
