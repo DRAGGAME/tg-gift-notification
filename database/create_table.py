@@ -8,7 +8,7 @@ class CreateTable(AdminOperations):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS profiles (
                                     id SERIAL PRIMARY KEY,
                                     number_profile INTEGER UNIQUE NOT NULL,
-                                    type_regime TEXT DEFAULT 'down',
+                                    type_regime TEXT DEFAULT 'Down',
                                     count_one_gift INTEGER DEFAULT 2,
                                     price_min INTEGER DEFAULT 0,
                                     price_max INTEGER DEFAULT 1000,
@@ -19,7 +19,7 @@ class CreateTable(AdminOperations):
         if await self.execute_query("""SELECT * FROM profiles"""):
             pass
         else:
-            await self.insert_profile()
+            await self.insert_profile("")
 
     async def create_transaction_donat(self):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS all_transaction (
@@ -33,8 +33,6 @@ class CreateTable(AdminOperations):
     async def create_settings_table(self):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS settings_table (
         id SERIAL PRIMARY KEY,
-        bot_balance INTEGER DEFAULT 0,
-        default_channel TEXT DEFAULT 'default',
         admin_chat_id TEXT DEFAULT '0',
         password_admin TEXT DEFAULT 'vFDJSldsfCEldsSA1317Opd', 
         activate_profile INTEGER DEFAULT 1,
@@ -44,11 +42,10 @@ class CreateTable(AdminOperations):
         if await self.execute_query("""SELECT password_admin FROM settings_table LIMIT 1"""):
             pass
         else:
-            await self.execute_query("""INSERT INTO settings_table (default_channel)
+            await self.execute_query("""INSERT INTO settings_table (activate_profile)
                                         VALUES (DEFAULT)""")
 
-    async def delete_all(self):
-        await self.execute_query("""DROP TABLE user_data""")
-        await self.execute_query("""DROP TABLE accepted_users""")
-        await self.execute_query("""DROP TABLE faq_table""")
-        await self.execute_query("""DROP TABLE settings_table""")
+    async def delete_all_table(self):
+        await self.execute_query("""DROP TABLE IF EXISTS all_transaction;""")
+        await self.execute_query("""DROP TABLE IF EXISTS settings_table;""")
+        await self.execute_query("""DROP TABLE IF EXISTS profiles;""")

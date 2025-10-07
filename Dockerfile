@@ -1,17 +1,17 @@
-FROM continuumio/miniconda3:latest
-
-LABEL main='Max Nov'
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY . /app
+COPY requirements.txt .
 
-RUN conda env create -f telegrambot.yml \
-    && echo "conda activate TelegramBotGift" > ~/.bashrc \
-    && conda clean -afy
+#RUN python3 -m venv venv
+#
+#ENV PATH="/app/venv/bin:$PATH"
 
-ENV PATH=/opt/conda/envs/telegramBotsAdm/bin:$PATH
+RUN pip install -r requirements.txt
 
 EXPOSE 5432
+
+COPY . /app
 
 CMD ["python", "run.py"]

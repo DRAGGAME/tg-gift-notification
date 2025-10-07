@@ -1,11 +1,7 @@
-from typing import Union
-
 from aiogram.filters import BaseFilter
-
-from database.admin_operations import AdminOperations
-
 from aiogram.types import Message
 
+from database.admin_operations import AdminOperations
 from logger import logger
 
 

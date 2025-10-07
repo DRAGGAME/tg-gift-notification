@@ -77,7 +77,7 @@ class FabricInline(KeyboardFactory):
         )
 
         button_replenishment = InlineKeyboardButton(
-            text="Пополнение звёзд⭐",
+            text="⭐Пополнение звёзд⭐",
             callback_data=InlineProfileMenu(
                 profile_menu_action="replenishment",
                 number_profile=number_profile,
@@ -125,10 +125,19 @@ class FabricInline(KeyboardFactory):
             ).pack()
         )
 
+        button_activate_profile = InlineKeyboardButton(
+            text="🔛Активировать профиль🔛",
+            callback_data=InlineProfileMenu(
+                profile_menu_action="activate_profile",
+                number_profile=number_profile,
+            ).pack()
+        )
+
         self.builder_inline.add(button_begin_price, button_end_price)
         self.builder_inline.row(button_count_one_gift)
         self.builder_inline.row(button_description, button_channel_connection)
         self.builder_inline.row(button_choice_mode)
+        self.builder_inline.row(button_activate_profile)
         self.builder_inline.row(button_replenishment)
         self.builder_inline.row(button_delete_profile)
         self.builder_inline.row(self.back_button)
@@ -169,6 +178,40 @@ class FabricInline(KeyboardFactory):
         self.builder_inline.add(self.back_button)
         return self.builder_inline.as_markup()
 
-    async def back_profile_menu(self
-                                ):
+    async def back_profile_menu(self, number_profile: int):
         await self.create_builder_inline()
+        button_back = InlineKeyboardButton(
+            text="Возврат",
+            callback_data=InlineProfileMenu(
+                profile_menu_action="back",
+                number_profile=number_profile
+            ).pack()
+        )
+
+        self.builder_inline.add(button_back)
+        return self.builder_inline.as_markup()
+
+
+    async def payment_callback(self, price: int, number_profile: int):
+        await self.create_builder_inline()
+
+        pay = InlineKeyboardButton(
+            text=f"Оплатить {price} XTR",
+            pay=True,
+        )
+
+        button_back = InlineKeyboardButton(
+            text="Отмена платежа",
+            callback_data=InlineProfileMenu(
+                profile_menu_action="cancel_pay",
+                number_profile=number_profile
+            ).pack()
+        )
+
+        self.builder_inline.add(pay)
+        self.builder_inline.row(button_back)
+
+        return self.builder_inline.as_markup()
+
+
+

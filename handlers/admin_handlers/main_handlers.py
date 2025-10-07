@@ -7,6 +7,7 @@ from database.admin_operations import AdminOperations
 from filters.check_admin import CheckAdminDefault
 from filters.check_admin_for_setup import CheckAdminSetup
 from keyboards.menu_fabric import FabricInline, InlineAdminMenu, InlineSwitchProfile
+from schedulers.scheduler_object import scheduler
 
 router_for_main = Router()
 sqlbase_admin = AdminOperations()
@@ -40,6 +41,21 @@ async def switch_profile_callback(callback: CallbackQuery):
     await callback.message.edit_text("Выберите профиль", reply_markup=kb)
     await callback.answer("Выберите профиль")
 
-@router_for_main.callback_query(InlineSwitchProfile.filter(F.action=="create_profile"))
+@router_for_main.callback_query(InlineAdminMenu.filter(F.action=="clear_settings"))
 async def create_profile_callback(callback: CallbackQuery):
-    pass
+    from database.create_table import CreateTable
+    sqlbase_table = CreateTable()
+    await sqlbase_table.connect()
+    scheduler.pause()
+
+    await sqlbase_table.delete_all_table()
+
+    await sqlbase_table.create_profiles_table()
+    await sqlbase_table.create_settings_table()
+    await sqlbase_table.create_transaction_donat()
+
+    await callback.message.delete()
+    await sqlbase_table.close()
+    scheduler.resume()
+
+    await callback.answer("ВСЁ СБРОШЕНО", show_alert=True)

@@ -25,28 +25,34 @@ async def switch_profile_callback(callback: CallbackQuery, callback_data: Callba
     bot_stars = await get_bot_stars()
 
     await sqlbase_for_switch.close()
-    await callback.message.edit_text("Вы открыли панель действий\n"
-                         "Что вы хотите сделать?\n\n"
-                         "<pre>"
-                         f"Баланс звёзд в боте(ваши): {bot_stars}"
-                         f"</pre>", reply_markup=keyboard_profile)
+    await callback.message.edit_text(text="Вы открыли панель действий\n"
+                                         "Что вы хотите сделать?\n\n"
+                                         "<pre>"
+                                         f"Баланс звёзд в боте(ваши): {bot_stars}\n\n"
+                                         f"Тип режима покупки: {last_profile_data[2]}\n"
+                                         f"Комменатрий к подарку: {last_profile_data[-2]}\n"
+                                         f"Канал для отправки подарков: {last_profile_data[-1]}"
+                                         f"</pre>", reply_markup=keyboard_profile)
     await callback.answer()
 
 @router_for_switch.callback_query(InlineSwitchProfile.filter(F.profile_action=="create_profile"))
 async def create_new_profile_callback(callback: CallbackQuery):
     await sqlbase_for_switch.connect()
-    try_profile = await sqlbase_for_switch.insert_profile()
+    try_profile = await sqlbase_for_switch.insert_profile(str(callback.message.chat.id))
     if try_profile:
         keyboard_profile = await keyboard_for_switch.inline_profile_menu((0, 40),
                                                                          2, try_profile)
         bot_stars = await get_bot_stars()
 
         await sqlbase_for_switch.close()
-        await callback.message.edit_text("Вы открыли панель действий\n"
-                             "Что вы хотите сделать?\n\n"
-                             "<pre>"
-                             f"Баланс звёзд в боте(ваши): {bot_stars}"
-                             f"</pre>", reply_markup=keyboard_profile)
+        await callback.message.edit_text(text="Вы открыли панель действий\n"
+                                             "Что вы хотите сделать?\n\n"
+                                             "<pre>"
+                                             f"Баланс звёзд в боте(ваши): {bot_stars}\n\n"
+                                             f"Тип режима покупки: Down\n"
+                                             f"Комменатрий к подарку: \n"
+                                             f"Канал для отправки подарков: "
+                                             f"</pre>", reply_markup=keyboard_profile)
         await callback.answer()
     else:
         await callback.answer(text="Максимальное количество профилей - 5", show_alert=True)

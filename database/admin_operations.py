@@ -21,15 +21,15 @@ class AdminOperations(Sqlbase):
                                         admin_chat_id=$2""",
                                  (None, admin_chat_id))
 
-    async def insert_profile(self) -> Optional[int]:
+    async def insert_profile(self, channel_for_answer: str) -> Optional[int]:
         profiles = await self.execute_query("""SELECT COUNT(*)
                                                FROM profiles""")
         print(profiles)
         if profiles != 5:
             number_profile = profiles[0][0] + 1
-            await self.execute_query("""INSERT INTO profiles(number_profile)
-                                        VALUES ($1)""",
-                                     (number_profile,))
+            await self.execute_query("""INSERT INTO profiles(number_profile, channel_for_answer)
+                                        VALUES ($1, $2)""",
+                                     (number_profile, channel_for_answer))
             return number_profile
 
         else:
@@ -37,13 +37,12 @@ class AdminOperations(Sqlbase):
 
     async def select_profile_last(self) -> tuple:
         settings_profiles = await self.execute_query("""SELECT type_regime,
-                                                               count_one_gift,
-                                                               price_min,
-                                                               price_max,
-                                                               bot_balance,
-                                                               channel_for_answer,
-                                                               admin_chat_id,
-                                                               activate_profile
+                                                                count_one_gift,
+                                                                price_min,
+                                                                price_max,
+                                                                comment_for_gift,
+                                                                channel_for_answer,
+                                                                admin_chat_id
                                                         FROM settings_table
                                                                  INNER JOIN profiles ON profiles.number_profile = settings_table.activate_profile""")
         return settings_profiles
@@ -100,8 +99,8 @@ class AdminOperations(Sqlbase):
             """
             UPDATE profiles
             SET type_regime = CASE
-                                  WHEN type_regime = 'Up' THEN 'Down'
-                                  WHEN type_regime = 'Down' THEN 'Up'
+                  WHEN type_regime = 'Up' THEN 'Down'
+                  WHEN type_regime = 'Down' THEN 'Up'
                 END
             WHERE number_profile = $1
               AND type_regime IN ('Up', 'Down')
@@ -109,5 +108,19 @@ class AdminOperations(Sqlbase):
             (number_profile,)
         )
 
+    async def insert_new_transaction(self, type_transaction: str, transaction_id, amount: int):
+        """
+        При новой транзакции, обязателен chat_id из user_data
+        :param type_transaction:
+        :param transaction_id:
+        :param amount:
+        :return:
+        """
+        await self.execute_query("""INSERT INTO all_transaction (type_transaction, transaction_id, amount)
+                                    VALUES ($1, $2, $3);""", (type_transaction, transaction_id, amount))
+
     async def delete_profile(self, number_profile: int):
         await self.execute_query("""DELETE FROM profiles WHERE number_profile = $1""", (number_profile,))
+
+    async def activate_profile(self, new_number_profile: int):
+        await self.execute_query("""UPDATE settings_table SET activate_profile = $1""", (new_number_profile,))
