@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      
     environment:
       - ip=postgres_sale_of_cours
       - DATABASE_PORT=5433     
