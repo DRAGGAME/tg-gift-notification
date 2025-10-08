@@ -2,7 +2,7 @@ from typing import Union
 
 import asyncpg
 
-from config import HOST, PASSWORD, DATABASE, USER
+from config import HOST, PASSWORD, DATABASE, USER, PG_PORT
 
 pg_host = HOST
 pg_user = USER
@@ -22,6 +22,7 @@ class Sqlbase:
                 user=pg_user,
                 password=pg_password,
                 database=pg_database,
+                port=PG_PORT,
                 min_size=1,
                 max_size=10000
             )

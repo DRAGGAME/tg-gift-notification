@@ -11,4 +11,5 @@ HOST = "postgres"
 USER = os.getenv('user')
 PASSWORD = os.getenv('password')
 DATABASE = os.getenv('DATABASE')
+PG_PORT = os.getenv('DATABASE_PORT')
 bot = Bot(token=TG_KEY, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
