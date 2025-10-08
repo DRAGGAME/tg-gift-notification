@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TG_KEY = os.getenv('TG_API')
-HOST = "postgres"
+HOST = os.getenv('ip')
 USER = os.getenv('user')
 PASSWORD = os.getenv('password')
 DATABASE = os.getenv('DATABASE')

@@ -1,15 +1,14 @@
 version: "3.9"
-
+###docker network create --driver bridge sale_of_cours_bot_postgres_network
 services:
-
   tg_gift_notification:
     build:
       context: .
       dockerfile: Dockerfile
-      
+    container_name: tg_gift_notification
     environment:
       - ip=postgres_sale_of_cours
-      - DATABASE_PORT=5433     
+      - DATABASE_PORT=5432
       - user=${user}
       - password=${password}
       - DATABASE=${DATABASE}
@@ -20,4 +19,3 @@ services:
 networks:
   sale_of_cours_bot_postgres_network:
     external: true
-
