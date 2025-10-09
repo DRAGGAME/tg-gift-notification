@@ -38,7 +38,7 @@ services:
       dockerfile: Dockerfile
     container_name: tg_gift
     environment:
-      - ip=postgres_sale_of_cours
+      - ip=postgres_gift
       - DATABASE_PORT=5432
       - user=${user}
       - password=${password}
