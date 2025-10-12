@@ -1,3 +1,5 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import asyncio
 
-scheduler = AsyncIOScheduler()
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+loop = asyncio.get_event_loop_policy().get_event_loop()
+scheduler = AsyncIOScheduler(loop=loop)

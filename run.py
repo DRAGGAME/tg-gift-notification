@@ -1,20 +1,17 @@
 import asyncio
 import logging
 
-from aiogram import Dispatcher, F
-from aiogram.fsm.context import FSMContext
-from aiogram.types import PreCheckoutQuery, Message
+from aiogram import Dispatcher
 from apscheduler.triggers.interval import IntervalTrigger
 
-from config import bot, DATABASE, PASSWORD, USER, TG_KEY, HOST
+from config import bot
 from database.admin_operations import AdminOperations
 from database.create_table import CreateTable
-from functions.get_bot_stars import get_bot_stars
-from handlers.admin_handlers.main_handlers import router_for_main
-from handlers.admin_handlers.switch_profile_handlers import router_for_switch
-from handlers.admin_handlers.upd_gift_and_star import router_upd
-from handlers.back_main_handler import router_for_back
-from handlers.user_handlers import router_for_user
+from database.db import Sqlbase
+from handlers.main_handlers import MainHandlers
+from handlers.switch_profile_handlers import SwitchProfileHandlers
+from handlers.upd_gift_and_star import UpdateOptionsHandlers
+from handlers.user_handlers import SetupHandlers
 from keyboards.menu_fabric import FabricInline
 from schedulers.scheduler_object import scheduler
 from schedulers.starts import start_cmd
@@ -25,13 +22,10 @@ logging.basicConfig(
            '%(lineno)d - %(name)s - %(message)s'
 )
 
-dp = Dispatcher()
 main_fabric_inline = FabricInline()
 main_sqlbase = AdminOperations()
 
-dp.include_routers(router_for_user, router_for_back, router_for_main, router_for_switch, router_upd)
-
-
+"""
 @dp.pre_checkout_query()
 async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery, state: FSMContext):
     await pre_checkout_query.answer(ok=True)
@@ -65,22 +59,49 @@ async def successful_payment_handler(message: Message, state: FSMContext):
                                      f"Канал для отправки подарков: {last_profile_data[-1]}"
                                      f"</pre>", reply_markup=keyboard_upd)
     await msg_invoice.delete()
+"""
+
+
+class TelegramBot:
+    """
+    Класс главный телеграм-бота
+    """
+
+    def __init__(self):
+        self.bot = bot
+        self.dp = Dispatcher()
+
+        main_handlers = MainHandlers()
+        switch_handlers = SwitchProfileHandlers()
+        setup_handlers = SetupHandlers()
+        update_options_handlers = UpdateOptionsHandlers()
+
+        self.dp.include_routers(main_handlers.router, switch_handlers.router, setup_handlers.router_setup,
+                                update_options_handlers.router)
+
+    async def run_main(self):
+        await Sqlbase.init_pool()
+
+        create_table = CreateTable()
+
+        await create_table.init_pgcrypto()
+        await create_table.create_profiles_table()
+        await create_table.create_settings_table()
+        await create_table.create_transaction_donat()
+
+        sqlbase_admin = AdminOperations()
+        scheduler.add_job(start_cmd, IntervalTrigger(seconds=120), args=[sqlbase_admin])
+        scheduler.start()
+
+        await self.dp.start_polling(self.bot, skip_updates=True)
+        await Sqlbase.close_pool()
 
 
 async def main():
-    print(TG_KEY, HOST, USER, PASSWORD, DATABASE)
+    await Sqlbase.init_pool()
+    tg_bot = TelegramBot()
 
-    sqlbase_create_table = CreateTable()
-    await sqlbase_create_table.connect()
-    # await sqlbase_create_table.delete_all()
-    await sqlbase_create_table.create_profiles_table()
-    await sqlbase_create_table.create_settings_table()
-    await sqlbase_create_table.create_transaction_donat()
-
-    sqlbase_admin = AdminOperations()
-    scheduler.add_job(start_cmd, IntervalTrigger(seconds=20), args=[sqlbase_admin])
-    scheduler.start()
-    await dp.start_polling(bot)
+    await tg_bot.run_main()
 
 
 if __name__ == "__main__":

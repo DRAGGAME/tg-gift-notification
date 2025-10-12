@@ -1,0 +1,24 @@
+test = [
+    # Gift ID: 5170145012310081615
+    # total_count=446, remaining_count=180
+    # Gift ID: 5170233102089322756
+    # total_count=219, remaining_count=209
+    # Gift ID: 5170250947678437525
+    # total_count=385, remaining_count=24
+    # Gift ID: 5168103777563050263
+    # total_count=132, remaining_count=90
+    # Gift ID: 5170144170496491616
+    # total_count=104, remaining_count=77
+    # Gift ID: 5170314324215857265
+    # total_count=498, remaining_count=263
+    # Gift ID: 5170564780938756245
+    # total_count=90, remaining_count=16
+    # Gift ID: 5168043875654172773
+    # total_count=130, remaining_count=120
+    # Gift ID: 5170690322832818290
+    # total_count=98, remaining_count=88
+    # Gift ID: 5170521118301225164
+    # total_count=290, remaining_count=102
+    # Gift ID: 6028601630662853006
+    # total_count=250, remaining_count=149
+]

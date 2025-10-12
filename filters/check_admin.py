@@ -6,27 +6,23 @@ from database.admin_operations import AdminOperations
 
 from aiogram.types import Message, CallbackQuery
 
+from database.other_operations import OtherOperation
 from logger import logger
 
 
-class CheckAdminDefault(BaseFilter):
+
+class CheckAdmin(BaseFilter):
+    """
+    Проверка на админа
+    """
 
     def __init__(self, sqlbase: AdminOperations):
         self.sqlbase = sqlbase
 
-    async def __call__(self, message_or_callback: Union[Message, CallbackQuery]) -> bool:
-        await self.sqlbase.connect()
-        password_and_user = await self.sqlbase.select_password_and_user()
-        await self.sqlbase.close()
-        if isinstance(message_or_callback, Message):
-            logger.info(f"{password_and_user}; {message_or_callback.chat.id} Использовал Router для админов")
-            if password_and_user[1] == str(message_or_callback.chat.id):
-                return True
-            else:
-                return False
+    async def __call__(self, message: Message) -> bool:
+        admin = await self.sqlbase.select_admin_chat_id()
+
+        if admin[0][0] == str(message.chat.id):
+            return True
         else:
-            logger.info(f"{password_and_user}; {message_or_callback.message.chat.id} Использовал Router для админов")
-            if password_and_user[1] == str(message_or_callback.message.chat.id):
-                return True
-            else:
-                return False
+            return False

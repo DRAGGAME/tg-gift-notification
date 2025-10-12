@@ -7,9 +7,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TG_KEY = os.getenv('TG_API')
-HOST = os.getenv('ip')
-USER = os.getenv('user')
-PASSWORD = os.getenv('password')
+PASSWORD_ADMIN = os.getenv('PASSWORD_ADMIN')
+
+HOST = os.getenv('HOST')
+USER = os.getenv('USER')
+PASSWORD = os.getenv('PASSWORD')
 DATABASE = os.getenv('DATABASE')
-PG_PORT = os.getenv('DATABASE_PORT')
+PG_PORT = os.getenv('DATABASE_PORT') if os.getenv('DATABASE_PORT') else 5432
+
+
 bot = Bot(token=TG_KEY, default=DefaultBotProperties(parse_mode=ParseMode.HTML))

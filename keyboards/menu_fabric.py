@@ -1,3 +1,4 @@
+from idlelib.configdialog import is_int
 from typing import Optional
 
 from aiogram.filters.callback_data import CallbackData
@@ -8,7 +9,7 @@ from keyboards.fabirc_kb import KeyboardFactory
 
 class InlineProfileMenu(CallbackData, prefix="ProfileMenu"):
     profile_menu_action: str
-    number_profile: Optional[int]
+    id_int: Optional[int]
 
 
 class InlineAdminMenu(CallbackData, prefix="main_menu"):
@@ -41,14 +42,14 @@ class FabricInline(KeyboardFactory):
         await self.create_builder_inline()
 
         button_profiles = InlineKeyboardButton(
-            text="Переключить профиль",
+            text="📃Переключить профиль📃",
             callback_data=InlineAdminMenu(
                 action="switch_profile",
             ).pack()
         )
 
         button_clear_settings = InlineKeyboardButton(
-            text="Заводские настройки",
+            text="🖥️Заводские настройки🖥️",
             callback_data=InlineAdminMenu(
                 action="clear_settings",
             ).pack()
@@ -58,13 +59,13 @@ class FabricInline(KeyboardFactory):
         self.builder_inline.row(button_clear_settings)
         return self.builder_inline.as_markup()
 
-    async def inline_profile_menu(self, price: tuple, gift_count: int, number_profile: int):
+    async def inline_profile_menu(self, price: tuple, gift_count: int, id_integer: int):
         await self.create_builder_inline()
         button_begin_price = InlineKeyboardButton(
             text=f"От {price[0]}⭐",
             callback_data=InlineProfileMenu(
                 profile_menu_action="begin_price",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -72,7 +73,7 @@ class FabricInline(KeyboardFactory):
             text=f"До {price[1]}⭐",
             callback_data=InlineProfileMenu(
                 profile_menu_action="end_price",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -80,7 +81,7 @@ class FabricInline(KeyboardFactory):
             text="⭐Пополнение звёзд⭐",
             callback_data=InlineProfileMenu(
                 profile_menu_action="replenishment",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -88,7 +89,7 @@ class FabricInline(KeyboardFactory):
             text=f"Кол-во одного подарка: {gift_count}🎁",
             callback_data=InlineProfileMenu(
                 profile_menu_action="count_one_gift",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
 
         )
@@ -97,7 +98,7 @@ class FabricInline(KeyboardFactory):
             text="Подключить канал🪢",
             callback_data=InlineProfileMenu(
                 profile_menu_action="channel_connection",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -105,7 +106,7 @@ class FabricInline(KeyboardFactory):
             text="Комментарии💬",
             callback_data=InlineProfileMenu(
                 profile_menu_action="description",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -113,7 +114,7 @@ class FabricInline(KeyboardFactory):
             text="🪛Сменить режим🪛",
             callback_data=InlineProfileMenu(
                 profile_menu_action="choice_mode",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -121,7 +122,7 @@ class FabricInline(KeyboardFactory):
             text="❌Удалить профиль❌",
             callback_data=InlineProfileMenu(
                 profile_menu_action="delete_profile",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -129,7 +130,7 @@ class FabricInline(KeyboardFactory):
             text="🔛Активировать профиль🔛",
             callback_data=InlineProfileMenu(
                 profile_menu_action="activate_profile",
-                number_profile=number_profile,
+                id_int=id_integer,
             ).pack()
         )
 
@@ -184,7 +185,7 @@ class FabricInline(KeyboardFactory):
             text="Возврат",
             callback_data=InlineProfileMenu(
                 profile_menu_action="back",
-                number_profile=number_profile
+                id_int=number_profile
             ).pack()
         )
 
@@ -204,7 +205,7 @@ class FabricInline(KeyboardFactory):
             text="Отмена платежа",
             callback_data=InlineProfileMenu(
                 profile_menu_action="cancel_pay",
-                number_profile=number_profile
+                id_int=number_profile
             ).pack()
         )
 

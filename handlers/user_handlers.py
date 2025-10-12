@@ -1,71 +1,86 @@
 import asyncio
 
-import apscheduler
-from aiogram import Router, F
+from aiogram import Router
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
 from config import bot
 from database.admin_operations import AdminOperations
 from filters.check_admin_for_setup import CheckAdminSetup
-
-
 from keyboards.menu_fabric import FabricInline
-router_for_user = Router()
-sqlbase_for_admin_function = AdminOperations()
-keyboard = FabricInline()
 
 
 class SetupFSM(StatesGroup):
     setup_password = State()
 
-@router_for_user.message(CommandStart(), CheckAdminSetup(sqlbase_for_admin_function))
-@router_for_user.message(Command(commands=["setup", "Setup"]), CheckAdminSetup(sqlbase_for_admin_function))
-async def setup_handler(message: Message, state: FSMContext):
-    await sqlbase_for_admin_function.connect()
-    password = await sqlbase_for_admin_function.select_password_and_user()
-    await state.clear()
 
-    if password:
-        await state.set_state(SetupFSM.setup_password)
+class SetupHandlers:
+    def __init__(self):
+        self.bot = bot
 
-        await message.delete()
+        self.router_setup = Router()
 
-        bot_msg = await message.answer("Войдите для начала работы.\nP.S Пароль единоразовый для одного аккаунта\nВведите пароль:")
+        self.admin_database = AdminOperations()
 
-        await state.update_data(password=password[0], bot_msg=bot_msg.message_id)
-    else:
-        bot_msg = await message.answer("Пароля - не существует, видимо, администратор уже существует\nВведите команду и пароль заново")
+        self.admin_fabric_inline = FabricInline()
 
-        await state.update_data(bot_msg=bot_msg.message_id)
+        self.register_start_handlers()
 
-@router_for_user.message(SetupFSM.setup_password)
-async def setup_from_password_handler(message: Message, state: FSMContext):
-    msg_id = await state.get_value("bot_msg")
-    if message.text:
-        password = await state.get_value("password")
+    def register_start_handlers(self):
+        self.router_setup.message.register(self.setup_handler, CheckAdminSetup(self.admin_database), Command("setup"))
+        self.router_setup.message.register(self.setup_from_password_handler, SetupFSM.setup_password,
+                                     CheckAdminSetup(self.admin_database))
 
-        if message.text == password:
+    async def setup_handler(self, message: Message, state: FSMContext):
+        await state.clear()
 
+        password = await self.admin_database.select_password_and_user()
+        if password:
             await message.delete()
-            await sqlbase_for_admin_function.update_admin_password(str(message.chat.id))
 
-            msg_bot_two = await message.answer("Пароль - верный, вы зарегистрированы. Пароль - теперь недействителен\n\n"
-                                               "Введите /start")
+            await state.set_state(SetupFSM.setup_password)
+
+            bot_msg = await message.answer(
+                "Войдите для начала работы.\nP.S Пароль единоразовый для одного аккаунта\nВведите пароль:")
+
+            await state.update_data(bot_msg=bot_msg.message_id)
         else:
-            msg_bot_two = await message.answer("Пароль - неверный\nВведите команду и пароль заново")
-    else:
-        msg_bot_two = await message.answer("Это сообщение не текст\nВведите команду и пароль заново")
+            bot_msg = await message.answer(
+                "Пароля - не существует, видимо, администратор уже существует")
 
-    await bot.delete_message(chat_id=message.chat.id, message_id=int(msg_id))
-    await state.clear()
-    await sqlbase_for_admin_function.close()
-    await asyncio.sleep(30)
-    await bot.delete_message(chat_id=message.chat.id, message_id=int(msg_bot_two.message_id))
+            await asyncio.sleep(60)
+            await bot_msg.delete()
 
+    async def setup_from_password_handler(self, message: Message, state: FSMContext):
+        msg_id = await state.get_value("bot_msg")
+        await bot.delete_message(chat_id=message.chat.id, message_id=int(msg_id))
 
+        if message.text:
+            password = await self.admin_database.select_password_try(message.text)
+            if password[0][0]:
 
+                await message.delete()
+                await self.admin_database.update_admin_password(str(message.chat.id))
+                admin_keyboard = await self.admin_fabric_inline.inline_main_menu()
 
+                await message.answer(
+                    "Пароль - верный, вы зарегистрированы. Пароль - теперь недействителен\n\nЧто вы хотите сделать?",
+                    reply_markup=admin_keyboard)
+                await state.clear()
 
+                return
+
+            else:
+                msg_bot_two = await message.answer("Пароль - неверный\nВведите команду /setup и пароль заново")
+                await state.clear()
+
+                await asyncio.sleep(30)
+                await bot.delete_message(chat_id=message.chat.id, message_id=int(msg_bot_two.message_id))
+        else:
+            msg_bot_two = await message.answer("Это сообщение не текст\nВведите команду /setup и пароль заново")
+            await state.clear()
+
+            await asyncio.sleep(30)
+            await bot.delete_message(chat_id=message.chat.id, message_id=int(msg_bot_two.message_id))

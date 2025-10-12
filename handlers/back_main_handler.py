@@ -1,17 +1,10 @@
-from collections.abc import AsyncIterator
-
 from aiogram import Router, F
-from aiogram.filters.callback_data import CallbackData
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
-from aiogram.utils.formatting import Text
+from aiogram.types import CallbackQuery
 
 from config import bot
 from database.admin_operations import AdminOperations
-from database.db import Sqlbase
-from database.other_operations import OtherOperation
 from filters.check_admin import CheckAdminDefault
-from handlers.admin_handlers.main_handlers import sqlbase_admin
+from handlers.main_handlers import sqlbase_admin
 from keyboards.menu_fabric import FabricInline, InlineAdminMenu
 
 keyboard_fabric = FabricInline()

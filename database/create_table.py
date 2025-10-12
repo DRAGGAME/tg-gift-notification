@@ -1,13 +1,20 @@
+from config import PASSWORD_ADMIN
 from database.admin_operations import AdminOperations
 from database.db import Sqlbase
 
 
 class CreateTable(AdminOperations):
 
+    async def init_pgcrypto(self):
+        """
+        Инициализация pgcrypto
+        :return:
+        """
+        await self.execute_query("""CREATE EXTENSION IF NOT EXISTS pgcrypto;""")
+
     async def create_profiles_table(self):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS profiles (
                                     id SERIAL PRIMARY KEY,
-                                    number_profile INTEGER UNIQUE NOT NULL,
                                     type_regime TEXT DEFAULT 'Down',
                                     count_one_gift INTEGER DEFAULT 2,
                                     price_min INTEGER DEFAULT 0,
@@ -34,16 +41,16 @@ class CreateTable(AdminOperations):
         await self.execute_query("""CREATE TABLE IF NOT EXISTS settings_table (
         id SERIAL PRIMARY KEY,
         admin_chat_id TEXT DEFAULT '0',
-        password_admin TEXT DEFAULT 'vFDJSldsfCEldsSA1317Opd', 
+        password_admin TEXT,
         activate_profile INTEGER DEFAULT 1,
-        FOREIGN KEY (activate_profile) REFERENCES profiles (number_profile) ON DELETE RESTRICT
+        FOREIGN KEY (activate_profile) REFERENCES profiles (id) ON DELETE RESTRICT
         );""")
 
         if await self.execute_query("""SELECT password_admin FROM settings_table LIMIT 1"""):
             pass
         else:
-            await self.execute_query("""INSERT INTO settings_table (activate_profile)
-                                        VALUES (DEFAULT)""")
+            await self.execute_query("""INSERT INTO settings_table (password_admin)
+                                        VALUES (crypt($1, gen_salt('bf')));""", (PASSWORD_ADMIN,))
 
     async def delete_all_table(self):
         await self.execute_query("""DROP TABLE IF EXISTS all_transaction;""")

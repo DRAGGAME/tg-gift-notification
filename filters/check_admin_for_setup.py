@@ -6,19 +6,14 @@ from logger import logger
 
 
 class CheckAdminSetup(BaseFilter):
-
     def __init__(self, sqlbase: AdminOperations):
         self.sqlbase = sqlbase
 
     async def __call__(self, message: Message) -> bool:
-        await self.sqlbase.connect()
-        password_and_user = await self.sqlbase.select_password_and_user()
-        await self.sqlbase.close()
-        logger.info(f"{password_and_user}; {message.chat.id}")
-        if password_and_user[1] == str(message.chat.id):
-            return False
-
-        elif password_and_user[0]:
+        admin = await self.sqlbase.select_admin_chat()
+        if admin == "0":
             return True
+
         else:
             return False
+
