@@ -33,7 +33,7 @@ async def answer_answers(admin_database: AdminOperations, answer_fabric_kb: Fabr
                                      "Что вы хотите сделать?\n\n"
                                      "<pre>"
                                      f"Баланс звёзд в боте(ваши): {bot_stars}\n\n"
-                                     f"Тип режима покупки: {type_regime}\n"
+                                     f"Тип режима покупки(начиная): {type_regime}\n"
                                      f"Комменатрий к подарку: {description}\n"
                                      f"Канал для отправки подарков: {channel_answer}"
                                      f"</pre>", reply_markup=keyboard_upd)
