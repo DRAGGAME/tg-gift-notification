@@ -37,19 +37,16 @@ class AdminOperations(Sqlbase):
                                         admin_chat_id=$2""",
                                  (None, admin_chat_id))
 
-    async def insert_profile(self, channel_for_answer: str) -> Optional[str]:
-        profiles = await self.execute_query("""SELECT COUNT(*)
-                                               FROM profiles""")
-        print(profiles)
-        if profiles[0][0] == 0:
-            id_profile = await self.execute_query("""INSERT INTO profiles (channel_for_answer)
-                                                     VALUES ($1)
-                                                     RETURNING id;""",
-                                                  (channel_for_answer,))
-            return id_profile[0][0]
+    async def insert_profile(self, channel_for_answer: str):
 
-        else:
-            return None
+        id_profile = await self.execute_query("""INSERT INTO profiles (channel_for_answer)
+                                                 VALUES ($1)
+                                                 RETURNING id;""",
+                                              (channel_for_answer,))
+
+        count_profile = await self.execute_query("""SELECT COUNT(*) FROM profiles""")
+        return id_profile[0][0], count_profile[0][0]
+
 
     async def select_profile_last(self) -> tuple:
         settings_profiles = await self.execute_query("""SELECT type_regime,
@@ -79,27 +76,19 @@ class AdminOperations(Sqlbase):
                                                      (id_profile,))
         return settings_profiles[0]
 
-    async def update_gift_price(self, type_price: str, number_profile: int, price: int, last_price: tuple=[], price_dict: dict={}) -> dict:
+    async def update_gift_price(self, type_price: str, number_profile: int, price: int, last_price: tuple=[], price_dict: dict={}):
         if type_price == "begin_price":
-            last_price = await self.execute_query(f"""UPDATE profiles 
+            await self.execute_query(f"""UPDATE profiles 
                                         SET price_min = $1
-                                        WHERE id = $2 
-                                        RETURNING price_min;
+                                        WHERE id = $2;
                                         """,
                                      (price, number_profile,))
-            price_dict = {"begin_price": last_price[0][0],
-                          "end_price": None}
 
         elif type_price == "end_price":
-            last_price = await self.execute_query(f"""UPDATE profiles
+            await self.execute_query(f"""UPDATE profiles
                                         SET price_max = $1
-                                        WHERE id = $2 
-                                        RETURNING price_max""", (price, number_profile,))
-            price_dict = {"begin_price": None,
-                            "end_price": last_price[0][0]}
-        else:
-            price_dict = {"begin_price": None,
-                            "end_price": None}
+                                        WHERE id = $2 """, (price, number_profile,))
+
 
         return price_dict
 

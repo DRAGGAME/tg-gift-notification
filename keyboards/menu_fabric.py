@@ -160,7 +160,8 @@ class FabricInline(KeyboardFactory):
         if profiles:
             # Добавить уведомление callback.answer() на ответ к switch_profile
             for profile in profiles:
-                symbol = "⬇" if profile[0] == "down" else "⬆️"
+                print(profile[0])
+                symbol = "⬇" if profile[0] == "Down" else "⬆️"
                 button_tmp_profile = InlineKeyboardButton(
                     text=f"{profile[2]} - {profile[3]}⭐ {profile[1]}🎁 {symbol}",
                     callback_data=InlineSwitchProfile(
@@ -179,7 +180,7 @@ class FabricInline(KeyboardFactory):
         self.builder_inline.add(self.back_button)
         return self.builder_inline.as_markup()
 
-    async def back_profile_menu(self, number_profile: int):
+    async def back_profile_menu(self, number_profile: int, activate_channel_clear: bool=False, activate_clear_description: bool=False):
         await self.create_builder_inline()
         button_back = InlineKeyboardButton(
             text="Возврат",
@@ -189,7 +190,29 @@ class FabricInline(KeyboardFactory):
             ).pack()
         )
 
-        self.builder_inline.add(button_back)
+        if activate_channel_clear:
+
+            button_channel_clear = InlineKeyboardButton(
+                text="Сбросить канал",
+                callback_data=InlineProfileMenu(
+                    profile_menu_action="channel_clear",
+                    id_int=number_profile
+                ).pack()
+            )
+            self.builder_inline.row(button_channel_clear)
+
+        elif activate_clear_description:
+            button_description_clear = InlineKeyboardButton(
+                text="Сбросить подпись",
+                callback_data=InlineProfileMenu(
+                    profile_menu_action="description_clear",
+                    id_int=number_profile
+                ).pack()
+            )
+            self.builder_inline.row(button_description_clear)
+
+        self.builder_inline.row(button_back)
+
         return self.builder_inline.as_markup()
 
 

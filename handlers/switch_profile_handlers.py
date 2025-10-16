@@ -31,7 +31,7 @@ class SwitchProfileHandlers:
 
     async def switch_profile_callback(self, callback: CallbackQuery, callback_data: CallbackData):
         bot_stars = await get_bot_stars()
-
+        print(callback_data.profile_action)
         if callback_data.profile_action == "switch_profile":
             number_profile = callback_data.profile_data
 
@@ -47,9 +47,9 @@ class SwitchProfileHandlers:
             channel_answer: str = last_profile_data[-1]
 
         else:
-            try_profile = await self.admin_database.insert_profile("")
+            try_profile, count_profile = await self.admin_database.insert_profile("")
 
-            if try_profile:
+            if count_profile == 5:
                 await callback.answer("Вы достигли максимального количества профилей", show_alert=True)
                 return
 

@@ -8,6 +8,7 @@ from config import bot
 from database.admin_operations import AdminOperations
 from database.create_table import CreateTable
 from database.db import Sqlbase
+from handlers.back_main_handler import BackMainHandlers
 from handlers.main_handlers import MainHandlers
 from handlers.switch_profile_handlers import SwitchProfileHandlers
 from handlers.upd_gift_and_star import UpdateOptionsHandlers
@@ -75,9 +76,10 @@ class TelegramBot:
         switch_handlers = SwitchProfileHandlers()
         setup_handlers = SetupHandlers()
         update_options_handlers = UpdateOptionsHandlers()
+        back_main_handlers = BackMainHandlers()
 
         self.dp.include_routers(main_handlers.router, switch_handlers.router, setup_handlers.router_setup,
-                                update_options_handlers.router)
+                                update_options_handlers.router, back_main_handlers.router)
 
     async def run_main(self):
         await Sqlbase.init_pool()
