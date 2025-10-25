@@ -57,4 +57,4 @@ volumes:
 
 networks:
   tg_gift_network:
-    driver: local
+    driver: bridge
