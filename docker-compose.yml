@@ -1,38 +1,23 @@
 version: "3.9"
-###docker network create --driver bridge sale_of_cours_bot_postgres_network
-services:
 
+services:
   db:
     image: postgres:18
     container_name: postgres_gift
-    hostname: postgres_gift
     environment:
-      POSTGRES_USER: ${USER_DB}
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: ${DATABASE}
-      PGDATA: /var/lib/postgresql/pgdata
-    ports:
-      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/pgdata
-
-    command: >
-      postgres
-      -c max_connections=10000
-      -c shared_buffers=256MB
-      -c effective_cache_size=768MB
-      -c maintenance_work_mem=64MB
-      -c checkpoint_completion_target=0.7
-      -c wal_buffers=16MB
-      -c default_statistics_target=100
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${USER} -d ${DATABASE}" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    restart: unless-stopped
+      - pgdata:/var/lib/postgresql/data
     networks:
       - tg_gift_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   tg_gift_notification:
     build:
@@ -40,23 +25,20 @@ services:
       dockerfile: Dockerfile
     container_name: tg_gift_notification
     environment:
-      - HOST=postgres_gift
-      - DATABASE_PORT=5432
-      - USER_DB=${USER_DB}
-      - PASSWORD=${PASSWORD}
-      - DATABASE=${DATABASE}
-      - TG_API=${TG_API}
+      HOST: postgres_gift
+      DATABASE_PORT: 5432
+      USER: ${DB_USER}
+      PASSWORD: ${PASSWORD}
+      DATABASE: ${DATABASE}
+      TG_API: ${TG_API}
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - tg_gift_network
-    depends_on:
-      - db
 
 volumes:
   pgdata:
-    driver: local
-
-  logs:
-    driver: local
 
 networks:
   tg_gift_network:
