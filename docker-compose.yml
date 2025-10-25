@@ -4,8 +4,8 @@ services:
 
   db:
     image: postgres:18
-    container_name: postgres_sale_of_cours
-    hostname: postgres_sale_of_cours
+    container_name: postgres_gift
+    hostname: postgres_gift
     environment:
       POSTGRES_USER: ${USER}
       POSTGRES_PASSWORD: ${PASSWORD}
@@ -39,7 +39,7 @@ services:
       dockerfile: Dockerfile
     container_name: tg_gift_notification
     environment:
-      - ip=postgres_sale_of_cours
+      - ip=postgres_gift
       - DATABASE_PORT=5432
       - user=${USER}
       - password=${PASSWORD}
