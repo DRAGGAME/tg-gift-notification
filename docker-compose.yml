@@ -47,6 +47,8 @@ services:
       - TG_API=${TG_API}
     networks:
       - tg_gift_network
+    depends_on:
+      - db
 
 volumes:
   pgdata:
