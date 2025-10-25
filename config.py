@@ -10,7 +10,7 @@ TG_KEY = os.getenv('TG_API')
 PASSWORD_ADMIN = os.getenv('PASSWORD_ADMIN')
 
 HOST = os.getenv('HOST')
-USER = os.getenv('USER')
+USER_DB = os.getenv('USER_DB')
 PASSWORD = os.getenv('PASSWORD')
 DATABASE = os.getenv('DATABASE')
 PG_PORT = os.getenv('DATABASE_PORT') if os.getenv('DATABASE_PORT') else 5432

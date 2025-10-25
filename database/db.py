@@ -1,10 +1,10 @@
 from typing import Union
 import asyncpg
 
-from config import HOST, PASSWORD, DATABASE, USER
+from config import HOST, PASSWORD, DATABASE, USER_DB
 
 pg_host = HOST
-pg_user = USER
+pg_user = USER_DB
 pg_password = PASSWORD
 pg_database = DATABASE
 

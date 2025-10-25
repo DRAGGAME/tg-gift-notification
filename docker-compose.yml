@@ -7,14 +7,15 @@ services:
     container_name: postgres_gift
     hostname: postgres_gift
     environment:
-      POSTGRES_USER: ${USER}
+      POSTGRES_USER: ${USER_DB}
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: ${DATABASE}
       PGDATA: /var/lib/postgresql/pgdata
     ports:
       - "5432:5432"
     volumes:
-      - /pgdata:/var/lib/postgresql/pgdata
+      - pgdata:/var/lib/postgresql/pgdata
+
     command: >
       postgres
       -c max_connections=10000
@@ -25,7 +26,7 @@ services:
       -c wal_buffers=16MB
       -c default_statistics_target=100
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${USER} -d ${PASSWORD}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${USER} -d ${DATABASE}" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -41,7 +42,7 @@ services:
     environment:
       - HOST=postgres_gift
       - DATABASE_PORT=5432
-      - USER=${USER}
+      - USER=${USER_DB}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
       - TG_API=${TG_API}
