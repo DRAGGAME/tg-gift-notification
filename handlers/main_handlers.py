@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
 
 from config import bot
@@ -65,9 +66,15 @@ class MainHandlers:
         await sqlbase_table.create_profiles_table()
         await sqlbase_table.create_settings_table()
         await sqlbase_table.create_transaction_donat()
+        try:
+            await callback.message.delete()
 
-        await callback.message.delete()
+            scheduler.resume()
 
-        scheduler.resume()
+            await callback.answer("ВСЁ СБРОШЕНО", show_alert=True)
+        except TelegramBadRequest:
+            await callback.message.edit_text("Всё сброшено")
 
-        await callback.answer("ВСЁ СБРОШЕНО", show_alert=True)
+            scheduler.resume()
+            await callback.answer("ВСЁ СБРОШЕНО", show_alert=True)
+

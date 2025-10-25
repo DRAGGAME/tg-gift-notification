@@ -59,7 +59,7 @@ class FabricInline(KeyboardFactory):
         self.builder_inline.row(button_clear_settings)
         return self.builder_inline.as_markup()
 
-    async def inline_profile_menu(self, price: tuple, gift_count: int, id_integer: int):
+    async def inline_profile_menu(self, price: tuple, gift_count: int, id_integer: int, activation: str):
         await self.create_builder_inline()
         button_begin_price = InlineKeyboardButton(
             text=f"От {price[0]}⭐",
@@ -126,8 +126,9 @@ class FabricInline(KeyboardFactory):
             ).pack()
         )
 
+
         button_activate_profile = InlineKeyboardButton(
-            text="🔛Активировать профиль🔛",
+            text=f"{activation}Активировать профиль{activation}",
             callback_data=InlineProfileMenu(
                 profile_menu_action="activate_profile",
                 id_int=id_integer,
@@ -160,13 +161,14 @@ class FabricInline(KeyboardFactory):
         if profiles:
             # Добавить уведомление callback.answer() на ответ к switch_profile
             for profile in profiles:
-                print(profile[0])
-                symbol = "⬇" if profile[0] == "Down" else "⬆️"
+
+                activation = '🟢' if profile[-1] == profile[0] else '🔴'
+                symbol = "⬇" if profile[1] == "Down" else "⬆️"
                 button_tmp_profile = InlineKeyboardButton(
-                    text=f"{profile[2]} - {profile[3]}⭐ {profile[1]}🎁 {symbol}",
+                    text=f"{activation} | {profile[3]} - {profile[4]}⭐ {profile[2]}🎁 {symbol}",
                     callback_data=InlineSwitchProfile(
                         profile_action="switch_profile",
-                        profile_data=f"{profile[-1]}",
+                        profile_data=f"{profile[0]}",
                     ).pack()
                 )
                 self.builder_inline.row(button_tmp_profile)

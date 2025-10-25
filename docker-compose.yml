@@ -1,6 +1,38 @@
 version: "3.9"
 ###docker network create --driver bridge sale_of_cours_bot_postgres_network
 services:
+
+  db:
+    image: postgres:18
+    container_name: postgres_sale_of_cours
+    hostname: postgres_sale_of_cours
+    environment:
+      POSTGRES_USER: ${USER}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: ${DATABASE}
+      PGDATA: /var/lib/postgresql/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - /pgdata:/var/lib/postgresql/pgdata
+    command: >
+      postgres
+      -c max_connections=10000
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.7
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${USER_POSTGRES} -d ${DATABASE_POSTGRES}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - tg_gift_network
+
   tg_gift_notification:
     build:
       context: .
@@ -9,13 +41,20 @@ services:
     environment:
       - ip=postgres_sale_of_cours
       - DATABASE_PORT=5432
-      - user=${user}
-      - password=${password}
+      - user=${USER}
+      - password=${PASSWORD}
       - DATABASE=${DATABASE}
       - TG_API=${TG_API}
     networks:
-      - sale_of_cours_bot_postgres_network
+      - tg_gift_network
+
+volumes:
+  pgdata:
+    driver: local
+
+  logs:
+    driver: local
 
 networks:
-  sale_of_cours_bot_postgres_network:
-    external: true
+  tg_gift_network:
+    driver: local

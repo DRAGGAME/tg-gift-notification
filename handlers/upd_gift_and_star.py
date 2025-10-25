@@ -1,5 +1,8 @@
+import asyncio
+
 from aiogram import Router, F
 from aiogram.exceptions import TelegramBadRequest
+from aiogram.filters import Command
 from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -8,6 +11,7 @@ from asyncpg import ForeignKeyViolationError, RestrictViolationError
 
 from config import bot
 from database.admin_operations import AdminOperations
+from filters.check_admin import CheckAdmin
 from functions.answer_answers import answer_answers
 from keyboards.menu_fabric import FabricInline, InlineProfileMenu
 from logger import logger
@@ -51,9 +55,9 @@ class UpdateOptionsHandlers:
         self.router.callback_query.register(self.upd_begin_price, InlineProfileMenu.filter(
             F.profile_menu_action.in_(["begin_price", "end_price", "replenishment"])))
 
-        self.router.message.register(self.create_invoice_or_edit_prices, Payment.count_for_pay)
-        self.router.message.register(self.create_invoice_or_edit_prices, UpdStar.end_price)
-        self.router.message.register(self.create_invoice_or_edit_prices, UpdStar.begin_price)
+        self.router.message.register(self.create_invoice_or_edit_stars, Payment.count_for_pay)
+        self.router.message.register(self.create_invoice_or_edit_stars, UpdStar.end_price)
+        self.router.message.register(self.create_invoice_or_edit_stars, UpdStar.begin_price)
 
         self.router.callback_query.register(self.count_one_gift_begin,
                                             InlineProfileMenu.filter(F.profile_menu_action == "count_one_gift"))
@@ -76,6 +80,9 @@ class UpdateOptionsHandlers:
                                             InlineProfileMenu.filter(F.profile_menu_action == "cancel_pay"))
         self.router.callback_query.register(self.cancel_pay_handler,
                                             InlineProfileMenu.filter(F.profile_menu_action == "back"))
+
+        self.router.channel_post.register(self.chat_id_handler, Command("chat_id"), CheckAdmin(self.admin_database))
+
 
     async def upd_begin_price(self, callback: CallbackQuery, state: FSMContext, callback_data: CallbackData):
         begin_or_end_price = callback_data.profile_menu_action
@@ -105,9 +112,9 @@ class UpdateOptionsHandlers:
         await state.update_data(msg_callback=msg_callback)
         await callback.answer()
 
-    async def create_invoice_or_edit_prices(self, message: Message, state: FSMContext):
+    async def create_invoice_or_edit_stars(self, message: Message, state: FSMContext):
         """
-        Хэндлер для создания счёта или изменения параметров покупки звёзд(от скольких до скольких)
+        Хэндлер для создания счёта или изменения параметров покупки подарков по звёздам(от скольких до скольких)
         :param message:
         :param state:
         :return:
@@ -121,7 +128,9 @@ class UpdateOptionsHandlers:
             try:
                 price_in_pay = int(message.text)
 
-                if price_in_pay >= 0 <= 1_000_000:
+                if 1_000_000 >= price_in_pay >= 0:
+                    await message.delete()
+
                     type_state = await state.get_state()
                     type_state = type_state.split(sep=":")
 
@@ -136,8 +145,11 @@ class UpdateOptionsHandlers:
                             currency="XTR",
                             reply_markup=await self.begin_fabric_keyboard.payment_callback(price_in_pay, number_profile)
                         )
-
+                        await state.clear()
                         await state.update_data(msg_invoice=msg_invoice, number_profile=number_profile)
+                        await answer_answers(answer_fabric_kb=self.begin_fabric_keyboard,
+                                             msg_callback=msg_callback,
+                                             number_profile=number_profile, admin_database=self.admin_database)
                         await message.delete()
 
                     else:
@@ -150,7 +162,7 @@ class UpdateOptionsHandlers:
                                              msg_callback=msg_callback,
                                              number_profile=number_profile, admin_database=self.admin_database)
 
-                    await state.clear()
+                        await state.clear()
 
                 else:
                     await bot.edit_message_text(message_id=msg_callback.message_id, chat_id=msg_callback.chat.id,
@@ -162,7 +174,6 @@ class UpdateOptionsHandlers:
         except TelegramBadRequest:
             pass
 
-        await message.delete()
 
     async def count_one_gift_begin(self, callback: CallbackQuery, state: FSMContext, callback_data: CallbackData):
         """
@@ -337,4 +348,11 @@ class UpdateOptionsHandlers:
                                  number_profile=number_profile, admin_database=self.admin_database)
         except TelegramBadRequest:
             pass
+
+    async def chat_id_handler(self, message: Message):
+        await message.delete()
+        msg = await message.answer(f"Айди чата: <code>{message.chat.id}</code>\n\n"
+                                   f"У вас минута на копирование")
+        await asyncio.sleep(60)
+        await msg.delete()
 

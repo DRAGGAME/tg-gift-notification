@@ -10,23 +10,27 @@ from keyboards.menu_fabric import FabricInline
 
 async def answer_answers(admin_database: AdminOperations, answer_fabric_kb: FabricInline,
                          msg_callback: Message, number_profile: int):
+
     last_profile_data = await admin_database.select_profile(int(number_profile))
 
     type_regime = "с менее ценных" if last_profile_data[1] == "Up" else "с более ценных"
-
-    begin_price = last_profile_data[-5]
-    end_price = last_profile_data[-4]
+    begin_price = last_profile_data[3]
+    end_price = last_profile_data[4]
 
     gift_count = last_profile_data[2]
 
-    description: str = last_profile_data[-2]
-    channel_answer: str = last_profile_data[-1]
+    description: str = last_profile_data[6]
+    channel_answer: str = last_profile_data[7]
 
     price: Tuple[int, int] = (begin_price, end_price)
 
+    activation = '🟢' if last_profile_data[-4] == number_profile else '🔴'
+    print(activation)
     bot_stars = await get_bot_stars()
 
-    keyboard_upd = await answer_fabric_kb.inline_profile_menu(price, gift_count, number_profile)
+
+
+    keyboard_upd = await answer_fabric_kb.inline_profile_menu(price, gift_count, number_profile, activation)
 
     await bot.edit_message_text(message_id=msg_callback.message_id, chat_id=msg_callback.chat.id,
                                 text="Вы открыли панель действий\n"

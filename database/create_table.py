@@ -17,8 +17,8 @@ class CreateTable(AdminOperations):
                                     id SERIAL PRIMARY KEY,
                                     type_regime TEXT DEFAULT 'Down',
                                     count_one_gift INTEGER DEFAULT 2,
-                                    price_min INTEGER DEFAULT 0,
-                                    price_max INTEGER DEFAULT 1000,
+                                    price_min BIGINT DEFAULT 0,
+                                    price_max BIGINT DEFAULT 1000,
                                     auto_upgrade BOOLEAN DEFAULT FALSE,
                                     comment_for_gift TEXT DEFAULT '',
                                     channel_for_answer TEXT DEFAULT ''

@@ -61,19 +61,81 @@ class AdminOperations(Sqlbase):
         return settings_profiles
 
     async def select_profiles(self) -> tuple:
-        settings_profiles = await self.execute_query("""SELECT type_regime,
-                                                               count_one_gift,
-                                                               price_min,
-                                                               price_max,
-                                                               id
-                                                        FROM profiles""")
+        settings_profiles = await self.execute_query("""WITH info_profiles AS (
+                                                        SELECT
+                                                            p.id,
+                                                            p.type_regime,
+                                                            p.count_one_gift,
+                                                            p.price_min,
+                                                            p.price_max
+                                                        FROM profiles AS p
+                                                        ORDER BY id ASC
+                                                        )
+                                                        SELECT
+                                                            inf_prof.id,
+                                                            inf_prof.type_regime,
+                                                            inf_prof.count_one_gift,
+                                                            inf_prof.price_min,
+                                                            inf_prof.price_max,
+                                                            s.activate_profile      
+                                                        FROM info_profiles AS inf_prof
+                                                        LEFT JOIN settings_table AS s
+                                                            ON s.activate_profile = inf_prof.id;
+                                                        """)
+        print(settings_profiles)
         return settings_profiles
 
     async def select_profile(self, id_profile: int) -> tuple:
-        settings_profiles = await self.execute_query("""SELECT *
-                                                        FROM profiles
-                                                        WHERE id = $1 """,
-                                                     (id_profile,))
+        settings_profiles = await self.execute_query("""
+            WITH foreign_key_check AS (
+                SELECT 
+                    tc.constraint_name, 
+                    kcu.table_name AS foreign_table_name,
+                    kcu.column_name AS foreign_column_name,
+                    ccu.table_name AS referenced_table,
+                    ccu.column_name AS referenced_column
+                FROM 
+                    information_schema.table_constraints AS tc 
+                JOIN 
+                    information_schema.key_column_usage AS kcu 
+                    ON tc.constraint_name = kcu.constraint_name
+                JOIN 
+                    information_schema.constraint_column_usage AS ccu 
+                    ON ccu.constraint_name = tc.constraint_name
+                WHERE 
+                    tc.constraint_type = 'FOREIGN KEY'
+                    AND ccu.table_name = 'profiles'
+                    AND ccu.column_name = 'id'
+                    AND kcu.table_name = 'settings'
+                    AND kcu.column_name = 'activate_profile'
+            )
+            SELECT 
+                p.id,
+                p.type_regime,
+                p.count_one_gift,
+                p.price_min,
+                p.price_max,
+                p.auto_upgrade,
+                p.comment_for_gift,
+                p.channel_for_answer,
+                s.id AS settings_id,
+                s.activate_profile,
+                fkc.constraint_name AS foreign_key_constraint,
+                fkc.foreign_table_name,
+                fkc.foreign_column_name
+            FROM 
+                profiles p
+            LEFT JOIN 
+                settings_table s 
+                ON s.activate_profile = p.id
+            LEFT JOIN 
+                foreign_key_check fkc 
+                ON true
+            WHERE 
+                p.id = $1;
+        """, (id_profile,))
+
+        print(settings_profiles[0])
         return settings_profiles[0]
 
     async def update_gift_price(self, type_price: str, number_profile: int, price: int, last_price: tuple=[], price_dict: dict={}):

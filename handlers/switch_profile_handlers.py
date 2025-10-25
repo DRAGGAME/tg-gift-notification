@@ -37,14 +37,20 @@ class SwitchProfileHandlers:
 
             last_profile_data = await self.admin_database.select_profile(int(number_profile))
 
-            type_regime = "с менее ценных" if last_profile_data[2] == "Up" else "с более ценных"
-
-            price: Tuple[int, int] = (last_profile_data[-5], last_profile_data[-4])
-            gift_count = last_profile_data[3]
+            type_regime = "с менее ценных" if last_profile_data[1] == "Up" else "с более ценных"
             try_profile = last_profile_data[0]
+            begin_price = last_profile_data[3]
+            end_price = last_profile_data[4]
 
-            description: str = last_profile_data[-2]
-            channel_answer: str = last_profile_data[-1]
+            gift_count = last_profile_data[2]
+
+            description: str = last_profile_data[6]
+            channel_answer: str = last_profile_data[7]
+
+            price: Tuple[int, int] = (begin_price, end_price)
+
+            activation = '🟢' if last_profile_data[-4] == number_profile else '🔴'
+
 
         else:
             try_profile, count_profile = await self.admin_database.insert_profile("")
@@ -60,9 +66,10 @@ class SwitchProfileHandlers:
 
             description: str = ""
             channel_answer: str = ""
+            activation = ''
 
         keyboard_profile = await self.switch_fabric_keyboard.inline_profile_menu(price=price, gift_count=gift_count,
-                                                                                 id_integer=try_profile)
+                                                                                 id_integer=try_profile, activation=activation)
 
         await callback.message.edit_text(text="Вы открыли панель действий\n"
                                               "Что вы хотите сделать?\n\n"

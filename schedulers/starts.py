@@ -11,7 +11,7 @@ from functions.get_bot_stars import get_bot_stars
 from logger import logger
 
 async def start_cmd(pool_sqlbase: AdminOperations, all_tmp_message: list=[]):
-
+    sorted_gifts = []
     result: Gifts = await bot.get_available_gifts()
     print(result)
     all_premium_gift = {}
@@ -146,8 +146,11 @@ async def start_cmd(pool_sqlbase: AdminOperations, all_tmp_message: list=[]):
                 end_count = getattr(info_a_gift, "remaining_count")
                 price_gift = getattr(info_a_gift, "star_count")
                 gift_id = getattr(info_a_gift, "id")
+
                 logger.info("Существует подарок премиум-подарок")
+
                 all_premium_gift[gift_id] = (price_gift, total_count, end_count, )
+
     if all_premium_gift:
         all_settings = await pool_sqlbase.select_profile_last()
         if not all_settings:
