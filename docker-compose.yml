@@ -42,7 +42,7 @@ services:
     environment:
       - HOST=postgres_gift
       - DATABASE_PORT=5432
-      - USER=${USER_DB}
+      - USER_DB=${USER_DB}
       - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
       - TG_API=${TG_API}
