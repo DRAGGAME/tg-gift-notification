@@ -7,14 +7,13 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message, LabeledPrice
-from asyncpg import ForeignKeyViolationError, RestrictViolationError
+from asyncpg import RestrictViolationError
 
 from config import bot
 from database.admin_operations import AdminOperations
 from filters.check_admin import CheckAdmin
 from functions.answer_answers import answer_answers
 from keyboards.menu_fabric import FabricInline, InlineProfileMenu
-from logger import logger
 
 
 class UpdStar(StatesGroup):

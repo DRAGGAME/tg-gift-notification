@@ -1,14 +1,8 @@
-from typing import Union
-
 from aiogram.filters import BaseFilter
 
 from database.admin_operations import AdminOperations
 
 from aiogram.types import Message, CallbackQuery
-
-from database.other_operations import OtherOperation
-from logger import logger
-
 
 
 class CheckAdmin(BaseFilter):

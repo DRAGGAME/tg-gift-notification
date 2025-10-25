@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 
 from config import bot
 from database.admin_operations import AdminOperations
-from filters.check_admin import CheckAdmin, CheckAdminCallback
+from filters.check_admin import CheckAdminCallback
 from keyboards.menu_fabric import FabricInline, InlineAdminMenu
 
 class BackMainHandlers:

@@ -6,7 +6,6 @@ from aiogram.types import CallbackQuery
 
 from config import bot
 from database.admin_operations import AdminOperations
-from database.other_operations import OtherOperation
 from functions.get_bot_stars import get_bot_stars
 from keyboards.menu_fabric import InlineSwitchProfile, FabricInline
 
@@ -18,7 +17,6 @@ class SwitchProfileHandlers:
 
         self.router = Router()
 
-        self.database = OtherOperation()
         self.admin_database = AdminOperations()
 
         self.switch_fabric_keyboard = FabricInline()

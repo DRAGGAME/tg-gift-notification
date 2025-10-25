@@ -1,6 +1,5 @@
 from config import PASSWORD_ADMIN
 from database.admin_operations import AdminOperations
-from database.db import Sqlbase
 
 
 class CreateTable(AdminOperations):

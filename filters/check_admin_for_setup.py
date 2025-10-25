@@ -2,7 +2,6 @@ from aiogram.filters import BaseFilter
 from aiogram.types import Message
 
 from database.admin_operations import AdminOperations
-from logger import logger
 
 
 class CheckAdminSetup(BaseFilter):
