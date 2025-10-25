@@ -61,7 +61,7 @@ class TelegramBot:
         await create_table.create_transaction_donat()
 
         sqlbase_admin = AdminOperations()
-        scheduler.add_job(start_cmd, IntervalTrigger(seconds=120), args=[sqlbase_admin])
+        scheduler.add_job(start_cmd, IntervalTrigger(seconds=5), args=[sqlbase_admin])
         scheduler.start()
 
         await self.dp.start_polling(self.bot, skip_updates=True)

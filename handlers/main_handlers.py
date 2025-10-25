@@ -5,9 +5,8 @@ from aiogram.filters import CommandStart
 from config import bot
 from aiogram.types import Message, CallbackQuery
 from database.admin_operations import AdminOperations
-from database.other_operations import OtherOperation
 from filters.check_admin import CheckAdmin
-from keyboards.menu_fabric import FabricInline, InlineAdminMenu, InlineSwitchProfile
+from keyboards.menu_fabric import FabricInline, InlineAdminMenu
 from schedulers.scheduler_object import scheduler
 
 
@@ -18,7 +17,6 @@ class MainHandlers:
 
         self.router = Router()
 
-        self.database = OtherOperation()
         self.admin_database = AdminOperations()
 
         self.begin_fabric_keyboard = FabricInline()

@@ -39,10 +39,10 @@ services:
       dockerfile: Dockerfile
     container_name: tg_gift_notification
     environment:
-      - ip=postgres_gift
+      - HOST=postgres_gift
       - DATABASE_PORT=5432
-      - user=${USER}
-      - password=${PASSWORD}
+      - USER=${USER}
+      - PASSWORD=${PASSWORD}
       - DATABASE=${DATABASE}
       - TG_API=${TG_API}
     networks:
