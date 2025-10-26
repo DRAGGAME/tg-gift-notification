@@ -223,4 +223,4 @@ class AdminOperations(Sqlbase):
         await self.execute_query("""UPDATE profiles SET comment_for_gift = default WHERE id = $1;""", (id_profile, ))
 
     async def clear_channel_id(self, id_profile: int):
-        await self.execute_query("""UPDATE profiles SET channel_for_gift = default WHERE id = $1;""", (id_profile, ))
+        await self.execute_query("""UPDATE profiles SET channel_for_answer = default WHERE id = $1;""", (id_profile, ))
