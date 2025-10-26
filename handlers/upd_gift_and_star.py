@@ -128,7 +128,6 @@ class UpdateOptionsHandlers:
                 price_in_pay = int(message.text)
 
                 if 1_000_000 >= price_in_pay >= 0:
-                    await message.delete()
 
                     type_state = await state.get_state()
                     type_state = type_state.split(sep=":")
@@ -145,7 +144,7 @@ class UpdateOptionsHandlers:
                             reply_markup=await self.begin_fabric_keyboard.payment_callback(price_in_pay, number_profile)
                         )
                         await state.clear()
-                        await state.update_data(msg_invoice=msg_invoice, number_profile=number_profile)
+                        await state.update_data(msg_callback=msg_callback, msg_invoice=msg_invoice, number_profile=number_profile)
                         await answer_answers(answer_fabric_kb=self.begin_fabric_keyboard,
                                              msg_callback=msg_callback,
                                              number_profile=number_profile, admin_database=self.admin_database)
