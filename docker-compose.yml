@@ -8,8 +8,11 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: ${DATABASE}
+      PGDATA: /var/lib/postgresql/pgdata
+    ports:
+      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/pgdata
+      - /pgdata:/var/lib/postgresql/pgdata
     networks:
       - tg_gift_network
     healthcheck:
@@ -31,13 +34,20 @@ services:
       PASSWORD: ${PASSWORD}
       DATABASE: ${DATABASE}
       TG_API: ${TG_API}
+
+    volumes:
+      - ./logs:/logs
     depends_on:
       - db
     networks:
       - tg_gift_network
 
 volumes:
+
   pgdata:
+    driver: local
+
+  logs:
     driver: local
 
 
