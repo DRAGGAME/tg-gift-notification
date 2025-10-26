@@ -5,7 +5,7 @@ services:
     image: postgres:18
     container_name: postgres_gift
     environment:
-      POSTGRES_USER: ${DB_USER}
+      POSTGRES_USER: ${USER_DB}
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: ${DATABASE}
       PGDATA: /var/lib/postgresql/pgdata
@@ -16,7 +16,7 @@ services:
     networks:
       - tg_gift_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DATABASE}"]
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB} -d ${DATABASE}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +30,7 @@ services:
     environment:
       HOST: postgres_gift
       DATABASE_PORT: 5432
-      USER: ${DB_USER}
+      USER: ${USER_DB}
       PASSWORD: ${PASSWORD}
       DATABASE: ${DATABASE}
       TG_API: ${TG_API}
