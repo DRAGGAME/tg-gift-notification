@@ -9,10 +9,10 @@ load_dotenv()
 TG_KEY = os.getenv('TG_API')
 PASSWORD_ADMIN = os.getenv('PASSWORD_ADMIN')
 
-HOST = os.getenv('HOST')
-USER_DB = os.getenv('USER_DB')
-PASSWORD = os.getenv('PASSWORD')
-DATABASE = os.getenv('DATABASE')
+HOST = os.getenv('HOST_POSTGRES')
+USER_DB = os.getenv('USER_POSTGRES')
+PASSWORD = os.getenv('PASSWORD_POSTGRES')
+DATABASE = os.getenv('DATABASE_POSTGRES')
 PG_PORT = os.getenv('DATABASE_PORT') if os.getenv('DATABASE_PORT') else 5432
 
 
