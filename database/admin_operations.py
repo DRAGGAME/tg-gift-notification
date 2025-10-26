@@ -80,7 +80,6 @@ class AdminOperations(Sqlbase):
                                                         LEFT JOIN settings_table AS s
                                                             ON s.activate_profile = inf_prof.id;
                                                         """)
-        print(settings_profiles)
         return settings_profiles
 
     async def select_profile(self, id_profile: int) -> tuple:
@@ -133,7 +132,6 @@ class AdminOperations(Sqlbase):
                 p.id = $1;
         """, (id_profile,))
 
-        print(settings_profiles[0])
         return settings_profiles[0]
 
     async def update_gift_price(self, type_price: str, number_profile: int, price: int, last_price: tuple=[], price_dict: dict={}):
@@ -220,3 +218,9 @@ class AdminOperations(Sqlbase):
         password_admin = await self.execute_query("""SELECT password_admin, admin_chat_id
                                                      FROM settings_table""")
         return password_admin[0]
+
+    async def clear_description(self, id_profile: int):
+        await self.execute_query("""UPDATE profiles SET comment_for_gift = default WHERE id = $1;""", (id_profile, ))
+
+    async def clear_channel_id(self, id_profile: int):
+        await self.execute_query("""UPDATE profiles SET channel_for_gift = default WHERE id = $1;""", (id_profile, ))

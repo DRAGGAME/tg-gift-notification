@@ -34,7 +34,7 @@ class SwitchProfileHandlers:
             number_profile = callback_data.profile_data
 
             last_profile_data = await self.admin_database.select_profile(int(number_profile))
-
+            print(last_profile_data)
             type_regime = "с менее ценных" if last_profile_data[1] == "Up" else "с более ценных"
             try_profile = last_profile_data[0]
             begin_price = last_profile_data[3]
@@ -47,7 +47,7 @@ class SwitchProfileHandlers:
 
             price: Tuple[int, int] = (begin_price, end_price)
 
-            activation = '🟢' if last_profile_data[-4] == number_profile else '🔴'
+            activation = '🟢' if last_profile_data[-4] == last_profile_data[0] else '🔴'
 
 
         else:

@@ -196,7 +196,7 @@ class FabricInline(KeyboardFactory):
             button_channel_clear = InlineKeyboardButton(
                 text="Сбросить канал",
                 callback_data=InlineProfileMenu(
-                    profile_menu_action="channel_clear",
+                    profile_menu_action="clear_channel",
                     id_int=number_profile
                 ).pack()
             )
@@ -206,7 +206,7 @@ class FabricInline(KeyboardFactory):
             button_description_clear = InlineKeyboardButton(
                 text="Сбросить подпись",
                 callback_data=InlineProfileMenu(
-                    profile_menu_action="description_clear",
+                    profile_menu_action="clear_description",
                     id_int=number_profile
                 ).pack()
             )

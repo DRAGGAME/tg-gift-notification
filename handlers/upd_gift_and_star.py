@@ -75,6 +75,11 @@ class UpdateOptionsHandlers:
 
         self.router.callback_query.register(self.activate_profile, InlineProfileMenu.filter(F.profile_menu_action == "activate_profile"))
 
+        self.router.callback_query.register(self.clear_description, InlineProfileMenu.filter(F.profile_menu_action == "clear_description"))
+
+        self.router.callback_query.register(self.clear_channel, InlineProfileMenu.filter(F.profile_menu_action == "clear_channel"))
+
+
         self.router.callback_query.register(self.cancel_pay_handler,
                                             InlineProfileMenu.filter(F.profile_menu_action == "cancel_pay"))
         self.router.callback_query.register(self.cancel_pay_handler,
@@ -258,7 +263,7 @@ class UpdateOptionsHandlers:
 
         kb = await self.begin_fabric_keyboard.back_profile_menu(number_profile=number_profile, activate_channel_clear=True)
         await state.set_state(UpdChannelConn.channel)
-        msg_callback = await callback.message.edit_text("Введите описание, чтобы изменить описание для подарка",
+        msg_callback = await callback.message.edit_text("Введите описание, чтобы изменить id канала для отправления подарка",
                                                         reply_markup=kb)
 
         await state.update_data(msg_callback=msg_callback, number_profile=number_profile)
@@ -346,6 +351,28 @@ class UpdateOptionsHandlers:
                                  number_profile=number_profile, admin_database=self.admin_database)
         except TelegramBadRequest:
             pass
+
+    async def clear_description(self, callback: CallbackQuery, callback_data: CallbackData, state: FSMContext):
+        number_profile: int = callback_data.id_int
+        await self.admin_database.clear_description(number_profile)
+        try:
+            await answer_answers(answer_fabric_kb=self.begin_fabric_keyboard,
+                                 msg_callback=callback.message,
+                                 number_profile=number_profile, admin_database=self.admin_database)
+        except TelegramBadRequest:
+            pass
+
+    async def clear_channel(self, callback: CallbackQuery, callback_data: CallbackData, state: FSMContext):
+        number_profile: int = callback_data.id_int
+        await self.admin_database.clear_channel_id(number_profile)
+        try:
+            await answer_answers(answer_fabric_kb=self.begin_fabric_keyboard,
+                                 msg_callback=callback.message,
+                                 number_profile=number_profile, admin_database=self.admin_database)
+        except TelegramBadRequest:
+            pass
+
+
 
     async def chat_id_handler(self, message: Message):
         await message.delete()
