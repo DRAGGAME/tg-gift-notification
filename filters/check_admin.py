@@ -20,6 +20,7 @@ class CheckAdmin(BaseFilter):
         else:
             return False
 
+
 class CheckAdminCallback(BaseFilter):
     """
     Проверка на админа

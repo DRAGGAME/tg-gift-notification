@@ -85,7 +85,7 @@ class UpdateOptionsHandlers:
         self.router.callback_query.register(self.cancel_pay_handler,
                                             InlineProfileMenu.filter(F.profile_menu_action == "back"))
 
-        self.router.channel_post.register(self.chat_id_handler, Command("chat_id"), CheckAdmin(self.admin_database))
+        self.router.channel_post.register(self.chat_id_handler, Command("chat_id"))
 
 
     async def upd_begin_price(self, callback: CallbackQuery, state: FSMContext, callback_data: CallbackData):
