@@ -40,11 +40,11 @@ services:
       dockerfile: Dockerfile
     container_name: bot
     environment:
-      HOST: postgres_18
+      HOST_POSTGRES: postgres_18
       DATABASE_PORT: 5432
-      USER: ${USER_POSTGRES}
-      PASSWORD: ${PASSWORD_POSTGRES}
-      DATABASE: ${DATABASE_POSTGRES}
+      USER_POSTGRES: ${USER_POSTGRES}
+      PASSWORD_POSTGRES: ${PASSWORD_POSTGRES}
+      DATABASE_POSTGRES: ${DATABASE_POSTGRES}
       TG_API: ${TG_API}
 
     volumes:
